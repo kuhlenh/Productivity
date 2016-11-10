@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace MyBikes.Web.Controllers
+namespace BikeSharing.Web.Controllers
 {
     public class HomeController : Controller
     {

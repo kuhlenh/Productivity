@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MyBikes.Web.Resources {
+namespace BikeSharing.Web.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace MyBikes.Web.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MyBikes.Web.Resources.Locale", typeof(Locale).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BikeSharing.Web.Resources.Locale", typeof(Locale).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

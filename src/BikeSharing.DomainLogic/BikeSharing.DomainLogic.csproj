@@ -7,8 +7,8 @@
     <ProjectGuid>{C51B1DE4-DE98-47CF-A02F-486B2EB6F50A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MyBikes.DomainLogic</RootNamespace>
-    <AssemblyName>MyBikes.DomainLogic</AssemblyName>
+    <RootNamespace>BikeSharing.DomainLogic</RootNamespace>
+    <AssemblyName>BikeSharing.DomainLogic</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

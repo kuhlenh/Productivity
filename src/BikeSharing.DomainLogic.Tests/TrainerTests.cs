@@ -1,7 +1,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MyBikes.DomainLogic.Tests
+namespace BikeSharing.DomainLogic.Tests
 {
     [TestClass()]
     public class TrainerTests

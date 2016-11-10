@@ -15,8 +15,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MyBikes.Web</RootNamespace>
-    <AssemblyName>MyBikes.Web</AssemblyName>
+    <RootNamespace>BikeSharing.Web</RootNamespace>
+    <AssemblyName>BikeSharing.Web</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
@@ -516,18 +516,18 @@
     <Content Include="src\scss\app\base\_utils.scss" />
     <Content Include="src\scss\app\base\_globals.scss" />
     <Content Include="src\scss\vendor\_overrides.scss" />
-    <Content Include="src\scss\app\components\mybikes\_menu.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_menu.scss" />
     <Content Include="src\scss\app\base\_fonts.scss" />
-    <Content Include="src\scss\app\components\mybikes\_header.scss" />
-    <Content Include="src\scss\app\components\mybikes\_hero.scss" />
-    <Content Include="src\scss\app\components\mybikes\_site.scss" />
-    <Content Include="src\scss\app\components\mybikes\_hiw.scss" />
-    <Content Include="src\scss\app\components\mybikes\_popular.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_header.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_hero.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_site.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_hiw.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_popular.scss" />
     <Content Include="tsconfig.json" />
-    <Content Include="src\scss\app\components\mybikes\_cities.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_cities.scss" />
     <Content Include="src\scss\app\app.scss" />
-    <Content Include="src\scss\app\components\mybikes\_footer.scss" />
-    <Content Include="src\scss\app\components\mybikes\_clients.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_footer.scss" />
+    <Content Include="src\scss\app\components\bikesharing\_clients.scss" />
     <Content Include="README.md" />
     <Content Include="Content\www\fonts\Icomoon-Regular\Icomoon-Regular.eot" />
     <Content Include="Content\www\fonts\Icomoon-Regular\Icomoon-Regular.ttf" />
@@ -693,7 +693,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>4467</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

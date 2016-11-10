@@ -7,8 +7,8 @@
     <ProjectGuid>{B71D3D9C-60C1-4B61-9238-2E2D301279D9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MyBikes.DomainLogic.Tests2</RootNamespace>
-    <AssemblyName>MyBikes.DomainLogic.Tests2</AssemblyName>
+    <RootNamespace>BikeSharing.DomainLogic.Tests</RootNamespace>
+    <AssemblyName>BikeSharing.DomainLogic.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -57,9 +57,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BikeSharing.DomainLogic\MyBikes.DomainLogic.csproj">
+    <ProjectReference Include="..\BikeSharing.DomainLogic\BikeSharing.DomainLogic.csproj">
       <Project>{c51b1de4-de98-47cf-a02f-486b2eb6f50a}</Project>
-      <Name>MyBikes.DomainLogic</Name>
+      <Name>BikeSharing.DomainLogic</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

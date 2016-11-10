@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace MyBikes.Web
+namespace BikeSharing.Web
 {
     public class MvcApplication : System.Web.HttpApplication
     {
