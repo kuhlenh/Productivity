@@ -1,141 +1,186 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 
-namespace BikeSharing.DomainLogic
+namespace Trainer
 {
+	public class Trainer
+	{
+		private List<WorkOut> _workOuts;
+		public int Goal { get; set; }
 
-    public class WorkOut
-    {
-        public int Miles { get; }
-        public TimeSpan Duration { get; }
+		public int MilesTravelled
+		{
+			get
+			{
+				int count = 0;
+				foreach (var work in _workOuts)
+				{
+					count += work.Miles;
+				}
+				return count;
+			}
+		}
 
+		public Trainer(int goal)
+		{
+			_workOuts = new List<WorkOut>();
+			Goal = goal; ;
+		}
 
-        public WorkOut(int miles, TimeSpan duration)
-        {
-            Miles = miles;
-            Duration = duration;
-        }
+		public Trainer()
+		{
+			_workOuts = new List<WorkOut>();
+		}
 
-        public override string ToString()
-        {
-            return "Workout: " + Miles + " Miles, " + Duration.TotalMinutes + " Minutes";
-        }
-    }
+		public void RegisterWorkout(int miles, TimeSpan duration, string notes)
+		{
+			_workOuts.Add(new WorkOut(miles, duration, notes));
+		}
 
-    public class Trainer
-    {
-        public int Goal { get; }
-        public int MilesTravelled
-        {
-            get
-            {
-                int count = 0;
-                foreach (var work in _workOuts)
-                {
-                    count += work.Miles;
-                }
-                return count;
-            }
-        }
+		public bool HasMetGoal()
+		{
+			if (MilesTravelled == Goal)
+			{
+				return true;
+			}
+			return false;
+		}
 
-        private List<WorkOut> _workOuts;
+		public static double GetMilePace(WorkOut workout) => workout.Duration.TotalMinutes / (double)workout.Miles;
 
-        public Trainer(int goal)
-        {
-            _workOuts = new List<WorkOut>();
-            Goal = goal; ;
-        }
+		public WorkOut GetMostMilesTraveled()
+		{
+			int mostMiles = 0;
+			WorkOut FurthestWorkout = null;
+			foreach (var workout in _workOuts)
+			{
+				if (workout.Miles > mostMiles)
+				{
+					FurthestWorkout = workout;
+					mostMiles = workout.Miles;
+				}
+			}
+			return FurthestWorkout;
+		}
 
-        public void RegisterWorkout(int miles, TimeSpan duration)
-        {
-            _workOuts.Add(new WorkOut(miles, duration));
-        }
+		public static Intensity GetWorkoutIntensity(WorkOut workout)
+		{
+			double milePace = GetMilePace(workout);
 
-        public bool HasMetGoal()
-        {
-            if (MilesTravelled == Goal)
-            {
-                return true;
-            }
-            return false;
-        }
+			if (workout == null)
+				return Intensity.None;
 
-        public double GetMilesPerMinute(WorkOut workout)
-        {
-            return workout.Miles / workout.Duration.TotalMinutes;
-        }
+			if (milePace < 3.5)
+				return Intensity.Hard;
+			else if (milePace < 6.0)
+				return Intensity.Medium;
+			else
+				return Intensity.Easy;
+		}
 
-        public WorkOut GetWorkoutWithBestSpeed()
-        {
-            double bestSpeed = 0;
-            WorkOut bestWorkout = null;
-            foreach (var workout in _workOuts)
-            {
-                double workoutSpeed = GetMilesPerMinute(workout);
-                if (workoutSpeed > bestSpeed)
-                {
-                    bestWorkout = workout;
+		public int GetWorkoutIntensityCount(Intensity desiredIntensity)
+		{
+			int intensityCount = 0;
+			foreach (var workout in _workOuts)
+			{
+				var intensity = GetWorkoutIntensity(workout);
+				if (desiredIntensity == intensity)
+				{
+					intensityCount++;
+				}
+			}
+			return intensityCount;
+		}
 
-                }
-            }
-            return bestWorkout;
-        }
+		public Dictionary<Intensity, int> GetAllIntensities()
+		{
+			Dictionary<Intensity, int> dictionary = new Dictionary<Intensity, int>();
+			foreach (var workout in _workOuts)
+			{
+				var intensity = GetWorkoutIntensity(workout);
+				if (dictionary.ContainsKey(intensity))
+					dictionary[intensity] += 1;
+				else
+					dictionary.Add(intensity, 1);
+			}
 
-        public WorkOut GetMostMilesTraveled()
-        {
-            var mostMiles = 0;
-            WorkOut FurthestWorkout = null;
-            foreach (var workout in _workOuts)
-            {
-                if (workout.Miles > mostMiles)
-                {
-                    FurthestWorkout = workout;
-                    mostMiles = workout.Miles;
-                }
-            }
-            return FurthestWorkout;
-        }
+			return dictionary;
+		}
 
-        public static string GetWorkoutIntensity(WorkOut workout)
-        {
-            if (workout == null)
-            {
-                return "No Workout";
-            }
-            if ((workout.Duration <= TimeSpan.FromMinutes(30)
-                    && workout.Miles >= 10)
-                    || workout.Miles >= 20)
-            {
-                return "Hard";
-            }
-            else if (workout.Duration < TimeSpan.FromMinutes(30)
-                        || workout.Miles < 10)
-            {
-                return "Easy";
-            }
-            else
-            {
-                return "Medium";
-            }
-        }
+		public (Intensity, int) MostFrequentIntensity()
+		{
+			var IntensityDictionary = GetAllIntensities();
+			var highestCount = (intensity:Intensity.None, count:0);
+			foreach (var (key, val) in IntensityDictionary)
+			{
+				if (val > highestCount.Item2)
+				{
+					highestCount = (key, val);
+				}
+			}
+			return highestCount;
+		}
 
+		public async Task<bool> SaveIntensitySummary(string url)
+		{
+			using (StreamWriter writer = File.CreateText(url))
+			{
+				await writer.WriteLineAsync("Intensity, Count");
+				var intensities = GetAllIntensities();
 
-        public int GetWorkoutIntensityCount(String desiredIntensity)
-        {
-            int intensityCount = 0;
-            foreach (var workout in _workOuts)
-            {
-                string intensity = GetWorkoutIntensity(workout);
-                if (desiredIntensity == intensity)
-                {
-                    intensityCount++;
-                }
-            }
-            return intensityCount;
-        }
-    }
+				foreach (var (k,v) in intensities)
+				{
+					await writer.WriteLineAsync(string.Format("{0},{1}", k, v));
+				}
+			}
+			return true;
+		}
 
+		public List<string> TweetifyWorkouts()
+		{
+			var listOfTweets = new List<string>();
+			foreach (var workout in _workOuts)
+			{
+				var intensity = GetWorkoutIntensity(workout);
+				if (intensity == Intensity.Easy || intensity == Intensity.None)
+				{
+					listOfTweets.Add("Pumping iron at the gym!");
+				}
+				else
+				{
+					var buffer = 11;
+					var charRemaining = 140 - (workout.Miles.ToString().Length + 
+											   workout.Duration.Minutes.ToString().Length)
+											   - buffer;
+
+					var tweetReady = workout.Notes.Length < 120 ? workout.Notes : workout.Notes.Substring(0, 120);
+					listOfTweets.Add(string.Format("{0} mi/{1} min : {2}", 
+										workout.Miles, workout.Duration.Minutes, tweetReady));
+				}
+			}
+
+			return listOfTweets;
+		}
+	}
+
+	public class WorkOut
+	{
+		public string Notes;
+		public int Miles { get; }
+		public TimeSpan Duration { get; }
+
+		public WorkOut(int miles, TimeSpan duration, string notes)
+		{
+			Miles = miles;
+			Duration = duration;
+			Notes = notes;
+		}
+
+		public override string ToString()
+		{
+			return string.Format("Workout: {0} Miles, {1} Minutes", Miles, Duration.TotalMinutes);
+		}
+	}
 }
