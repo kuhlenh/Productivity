@@ -7,7 +7,7 @@ namespace Trainer
 {
 	public class Trainer
 	{
-		private List<WorkOut> _workOuts;
+		private List<WorkOut> workOuts;
 		public int Goal { get; set; }
 
 		public int MilesTravelled
@@ -15,7 +15,7 @@ namespace Trainer
 			get
 			{
 				int count = 0;
-				foreach (var work in _workOuts)
+				foreach (var work in workOuts)
 				{
 					count += work.Miles;
 				}
@@ -25,18 +25,22 @@ namespace Trainer
 
 		public Trainer(int goal)
 		{
-			_workOuts = new List<WorkOut>();
-			Goal = goal; ;
+			workOuts = new List<WorkOut>();
+			Goal = goal;
 		}
 
 		public Trainer()
 		{
-			_workOuts = new List<WorkOut>();
+			workOuts = new List<WorkOut>();
+			WorkOut woo = new WorkOut();
+            woo.Miles = 0;
+            woo.Duration = TimeSpan.FromMinutes(0);
+            woo.Notes = "";
 		}
 
 		public void RegisterWorkout(int miles, TimeSpan duration, string notes)
 		{
-			_workOuts.Add(new WorkOut(miles, duration, notes));
+			workOuts.Add(new WorkOut(miles, duration, notes));
 		}
 
 		public bool HasMetGoal()
@@ -54,7 +58,7 @@ namespace Trainer
 		{
 			int mostMiles = 0;
 			WorkOut FurthestWorkout = null;
-			foreach (var workout in _workOuts)
+			foreach (var workout in workOuts)
 			{
 				if (workout.Miles > mostMiles)
 				{
@@ -83,7 +87,7 @@ namespace Trainer
 		public int GetWorkoutIntensityCount(Intensity desiredIntensity)
 		{
 			int intensityCount = 0;
-			foreach (var workout in _workOuts)
+			foreach (var workout in workOuts)
 			{
 				var intensity = GetWorkoutIntensity(workout);
 				if (desiredIntensity == intensity)
@@ -97,7 +101,7 @@ namespace Trainer
 		public Dictionary<Intensity, int> GetAllIntensities()
 		{
 			Dictionary<Intensity, int> dictionary = new Dictionary<Intensity, int>();
-			foreach (var workout in _workOuts)
+			foreach (var workout in workOuts)
 			{
 				var intensity = GetWorkoutIntensity(workout);
 				if (dictionary.ContainsKey(intensity))
@@ -132,8 +136,11 @@ namespace Trainer
 
 				foreach (var (k,v) in intensities)
 				{
-					await writer.WriteLineAsync(string.Format("{0},{1}", k, v));
+					await writer.WriteLineAsync($"{k},{v}");
 				}
+
+                var (intensity, count) = MostFrequentIntensity();
+
 			}
 			return true;
 		}
@@ -141,7 +148,7 @@ namespace Trainer
 		public List<string> TweetifyWorkouts()
 		{
 			var listOfTweets = new List<string>();
-			foreach (var workout in _workOuts)
+			foreach (var workout in workOuts)
 			{
 				var intensity = GetWorkoutIntensity(workout);
 				if (intensity == Intensity.Easy || intensity == Intensity.None)
@@ -156,8 +163,7 @@ namespace Trainer
 											   - buffer;
 
 					var tweetReady = workout.Notes.Length < 120 ? workout.Notes : workout.Notes.Substring(0, 120);
-					listOfTweets.Add(string.Format("{0} mi/{1} min : {2}", 
-										workout.Miles, workout.Duration.Minutes, tweetReady));
+					listOfTweets.Add($"{workout.Miles} mi/{workout.Duration.Minutes} min : {tweetReady}");
 				}
 			}
 
@@ -168,17 +174,21 @@ namespace Trainer
 	public class WorkOut
 	{
 		public string Notes;
-		public int Miles { get; }
-		public TimeSpan Duration { get; }
+		public int Miles { get; set; }
+		public TimeSpan Duration { get; set; }
 
 		public WorkOut(int miles, TimeSpan duration, string notes)
 		{
 			Miles = miles;
 			Duration = duration;
-			Notes = notes;
+            Notes = notes ?? throw new ArgumentNullException(nameof(notes));
 		}
 
-		public override string ToString()
+        public WorkOut()
+        { 
+        }
+
+        public override string ToString()
 		{
 			return string.Format("Workout: {0} Miles, {1} Minutes", Miles, Duration.TotalMinutes);
 		}

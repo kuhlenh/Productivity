@@ -183,4 +183,18 @@ namespace Trainer
 			return string.Format("Workout: {0} Miles, {1} Minutes", Miles, Duration.TotalMinutes);
 		}
 	}
+
+    public enum Intensity
+    {
+        None, Hard, Medium, Easy
+    }
+
+    public static class Extensions
+    {
+        public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> kvp, out TKey key, out TValue value)
+        {
+            key = kvp.Key;
+            value = kvp.Value;
+        }
+    }
 }
