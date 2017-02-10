@@ -1,76 +1,106 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
+using BikeSharing.DomainLogic;
 
 namespace Training
 {
-    public class Workout
-    {
-        public int ID { get; set; }
-        public User User { get; }
-        public TimeSpan Duration { get; set; }
-        public int AHR { get; set; }
-        public Intensity Level { get; }
-        public string Notes { get; set; }
-        public DateTime Date { get; set; }
 
-        public Workout(int id, TimeSpan duration, int heartRate, DateTime date, User u, string notes)
+    public class User
+    {
+        public string Username { get; set; }
+        public int Age { get; set; }
+        public double Weight { get; set; }
+        public double Height { get; set; }
+        public int MHR { get; }
+        public double BMR { get; }
+        public Gender Gender { get; set; }
+        public List<Workout> Workouts { get; set; }
+        public int Id { get; set; }
+
+        public User(int id, string username, int age, double weight, double height, Gender gender)
         {
-            ID = id;
-            User = u;
-            Duration = duration;
-            AHR = heartRate;
-            Date = date;
-            Level = CalculateIntensity();
-            Notes = notes;
+            Id = id;
+            Username = username;
+            Age = age;
+            Weight = weight;
+            Height = height;
+            MHR = 220 - age;
+            BMR = BasalMetabolicRate();
+            Gender = gender;
         }
 
-        private Intensity CalculateIntensity()
+        public void AddWorkout(params Workout[] w)
         {
-            var percent = AHR / (double)User.MHR;
-            
-            if (percent <= .5)
-                return Intensity.Light;
-            else if (percent > .5 && percent <= .7 )
-                return Intensity.Moderate;
+            if (Workouts != null)
+            {
+                Workouts.AddRange(w);
+            }
             else
-                return Intensity.Vigorous;
+            {
+                Workouts = w.ToList();
+            }
         }
 
-        public override string ToString()
+        // Return the fraction of average calories burned in the week
+        // from workouts over the basal metabolic rate calories for the 
+        // user
+        public double GetWeekHealthStatus()
         {
-            return string.Format("Workout ({0}): {1} Minutes", ID, Duration.TotalMinutes);
-        }
-    }
+            var today = DateTime.Now;
+            var thisWeek = Workouts.Where(w => w.Date > today.AddDays(-7)).ToList();
 
-    public enum Intensity
-    {
-        Light, Moderate, Vigorous
-    }
+            var totalDuration = thisWeek.Sum(w => w.Duration.TotalHours);
+            var averageHeartRate = thisWeek.Select(w => w.AHR).Average();
 
-    public class BikeWorkout : Workout
-    {
-        public double Miles { get; set; }
+            var avgCaloriesBurned = CalculateCalories(averageHeartRate, totalDuration);
+            var healthMetric = avgCaloriesBurned / BMR;
 
-        public BikeWorkout(int id, TimeSpan duration, int heartRate, DateTime date, User u, string notes) : base(id, duration, heartRate, date, u, notes)
-        {
-            Miles = 0.0;
+            return healthMetric;
         }
 
-        public BikeWorkout(int id, TimeSpan duration, int heartRate, DateTime date, double miles, User u, string notes) : base(id, duration, heartRate, date, u, notes)
+        //http://www.shapesense.com/fitness-exercise/calculators/heart-rate-based-calorie-burn-calculator.shtml
+        // Determine number of calories burned in a workout based on 
+        // heart rate when VO2Max is unknown
+        private double CalculateCalories(double averageHeartRate, double totalDuration)
         {
-            Miles = miles;
+            switch (Gender)
+            {
+                case Gender.Male:
+                    return (-55.0969 + (0.6309 * averageHeartRate) + (0.1988 * Weight) + (0.2017 * Age) / 4.184) * 60 * totalDuration;
+                case Gender.Female:
+                    return (-20.4022 + (0.4472 * averageHeartRate) - (0.1263 * Weight) + (0.074 * Age) / 4.184) * 60 * totalDuration;
+                default:
+                    return 0.0;
+            }
         }
 
-        public override string ToString()
+        // DEMO: Introduce local for weight and height calculations
+        // http://www.globalrph.com/harris-benedict-equation.htm
+        // Determine amount of energy required to maintain normal metabolic 
+        // activity via the Harris-Benedict Equation (in kg and cm)
+        private double BasalMetabolicRate()
         {
-            return string.Format("Workout ({0}): {1} Minutes and {2} Miles.", ID, Duration.TotalMinutes, Miles);
+            switch (Gender)
+            {
+                case Gender.Male:
+                    return 66.47 + (13.75 * Weight * 0.453592) + (5.003 * Height * 2.54) - (6.755 * Age);
+                case Gender.Female:
+                    return 655.1 + (9.563 * Weight * 0.453592) + (1.850 * Height * 2.54) - (4.676 * Age);
+                default:
+                    return 0.0;
+            }
         }
     }
 }
 
-
+namespace BikeSharing.DomainLogic
+{
+    public enum Gender
+    {
+        Male, Female
+    }
+}
 
 
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.25901.0
+VisualStudioVersion = 15.0.26131.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BikeSharing.Web", "src\BikeSharing.Web\BikeSharing.Web.csproj", "{84952F58-05C5-4ED5-8ECF-8F0D77F25D76}"
 EndProject
