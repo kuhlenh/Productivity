@@ -15,17 +15,18 @@ namespace Trainer.Tests
 
         private void CreateFemaleAthlete()
         {
+            var today = DateTime.Now;
             _user = new User(1, "kaseyu", 25, 150, 71, Gender.Female);
             var workout = new Workout(1, new TimeSpan(0, 25, 3), 93,
-                                      new DateTime(2017, 2, 8, 17, 11, 0),
+                                      today.AddDays(-1),
                                       _user,
                                       "Bodyweight circuit Wednesday!");
             var workout2 = new BikeWorkout(2, new TimeSpan(0, 32, 8), 153,
-                                           new DateTime(2017, 2, 6, 16, 11, 0), 3.01,
+                                           today.AddDays(-3), 3.01,
                                            _user,
                                            "Run around the lake");
             var workout3 = new BikeWorkout(3, new TimeSpan(2, 16, 34), 151,
-                                           new DateTime(2017, 2, 4, 10, 30, 0), 14.27,
+                                           today.AddDays(-4), 14.27,
                                            _user,
                                            "Biking to Red Hook!");
             _user.AddWorkout(workout, workout2, workout3);
@@ -33,14 +34,15 @@ namespace Trainer.Tests
 
         private void CreateMaleAthlete()
         {
+            var today = DateTime.Now;
             _user = new User(2, "eweb", 27, 208, 72.5, Gender.Male);
             var workout = new BikeWorkout(1, new TimeSpan(0, 32, 5), 128,
-                                      new DateTime(2017, 2, 6, 16, 12, 0),
+                                      today.AddDays(-2),
                                       3.14,
                                       _user,
                                       "Running with the puppy!");
             var workout2 = new Workout(1, new TimeSpan(0, 55, 14), 113,
-                                      new DateTime(2017, 2, 10, 7, 23, 0),
+                                      today.AddDays(-3),
                                       _user,
                                       "Pumping iron.");
             _user.AddWorkout(workout, workout2);

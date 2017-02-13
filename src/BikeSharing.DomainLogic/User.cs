@@ -14,7 +14,7 @@ namespace Training
         public double Height { get; set; }
         public int MHR { get; }
         public double BMR { get; }
-        public Gender Gender { get; set; }
+        public Gender Sex { get; set; }
         public List<Workout> Workouts { get; set; }
         public int Id { get; set; }
 
@@ -27,7 +27,7 @@ namespace Training
             Height = height;
             MHR = 220 - age;
             BMR = BasalMetabolicRate();
-            Gender = gender;
+            Sex = gender;
         }
 
         public void AddWorkout(params Workout[] w)
@@ -64,7 +64,7 @@ namespace Training
         // heart rate when VO2Max is unknown
         private double CalculateCalories(double averageHeartRate, double totalDuration)
         {
-            switch (Gender)
+            switch (Sex)
             {
                 case Gender.Male:
                     return (-55.0969 + (0.6309 * averageHeartRate) + (0.1988 * Weight) + (0.2017 * Age) / 4.184) * 60 * totalDuration;
@@ -81,7 +81,7 @@ namespace Training
         // activity via the Harris-Benedict Equation (in kg and cm)
         private double BasalMetabolicRate()
         {
-            switch (Gender)
+            switch (Sex)
             {
                 case Gender.Male:
                     return 66.47 + (13.75 * Weight * 0.453592) + (5.003 * Height * 2.54) - (6.755 * Age);
