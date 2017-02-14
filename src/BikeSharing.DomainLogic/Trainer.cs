@@ -18,6 +18,8 @@ namespace Training
         public Workout(int id, TimeSpan duration, int heartRate, DateTime date, User user, string notes)
         {
             this.id = id;
+            if (user == null)
+                throw new ArgumentNullException(nameof(User));
             User = user;
             Duration = duration;
             AHR = heartRate;

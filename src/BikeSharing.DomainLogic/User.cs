@@ -11,9 +11,9 @@ namespace Training
         public int Age { get; set; }
         public double Weight { get; set; }
         public double Height { get; set; }
+        public Gender Gender { get; set; }
         public int MHR { get; }
         public double BMR { get; }
-        public Gender Gender { get; set; }
         public List<Workout> Workouts { get; set; }
         public int Id { get; set; }
 
@@ -24,9 +24,9 @@ namespace Training
             Age = age;
             Weight = weight;
             Height = height;
+            Gender = gender;
             MHR = 220 - age;
             BMR = BasalMetabolicRate();
-            Gender = gender;
         }
 
         public void AddWorkout(params Workout[] w)
@@ -72,6 +72,14 @@ namespace Training
                 default:
                     return 0.0;
             }
+        }
+
+        public Workout GetBestWorkoutThisWeek()
+        {
+            var week = Workouts.Where(w => w.Date > DateTime.Now.Date.AddDays(-7));
+            var longest = week.Aggregate((w1, w2) => w1.Duration > w2.Duration ? w1 : w2);
+            var vigorous = week.Where(w => w.Level == Intensity.Vigorous).Aggregate((w1, w2) => w1.Duration > w2.Duration ? w1 : w2);
+            return vigorous ?? longest;
         }
 
         // DEMO: Introduce local for weight and height calculations

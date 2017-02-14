@@ -128,5 +128,13 @@ namespace Trainer.Tests
             var str = _user.Workouts.Skip(1).First().ToString();
             Assert.AreEqual($"{DateTime.Now.Date.AddDays(-3)}: Run around the lake (32 minutes, 3.01 miles)", str);
         }
+
+        [TestMethod]
+        public void TestBestWorkout1()
+        {
+            CreateFemaleAthlete();
+            var best = _user.GetBestWorkoutThisWeek();
+            Assert.AreEqual($"{DateTime.Now.Date.AddDays(-4)}: Biking to Red Hook! (137 minutes, 14.27 miles)", best.ToString());
+        }
     }
 }
