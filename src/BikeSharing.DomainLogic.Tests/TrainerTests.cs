@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Training;
-using BikeSharing.DomainLogic;
 
 namespace Trainer.Tests
 {
@@ -32,6 +31,11 @@ namespace Trainer.Tests
             _user.AddWorkout(workout, workout2, workout3);
         }
 
+        private void CreateNullAthlete()
+        {
+            _user = null;
+        }
+
         private void CreateMaleAthlete()
         {
             var today = DateTime.Now;
@@ -46,6 +50,20 @@ namespace Trainer.Tests
                                       _user,
                                       "Pumping iron.");
             _user.AddWorkout(workout, workout2);
+        }
+
+
+        [TestMethod]
+        public void TestAddWorkoutNull()
+        {
+            CreateNullAthlete();
+            var today = DateTime.Now;
+            Assert.ThrowsException<ArgumentNullException>(() => new BikeWorkout(1, new TimeSpan(0, 32, 5),
+                                                                                128,
+                                                                                today.AddDays(-2),
+                                                                                3.14,
+                                                                                _user,
+                                                                                "Running with the puppy!"));
         }
 
         [TestMethod]
@@ -93,6 +111,22 @@ namespace Trainer.Tests
             var nominator = (-55.0969 + (0.6309 * avg) + (0.1988 * _user.Weight) + (0.2017 * _user.Age) / 4.184) * 60 * duration;
             var actual = nominator / _user.BMR;
             Assert.AreEqual(score, actual, 0.00000001);
+        }
+
+        [TestMethod]
+        public void TestToStringFemale()
+        {
+            CreateFemaleAthlete();
+            var str = _user.Workouts.First().ToString();
+            Assert.AreEqual($"{DateTime.Now.Date.AddDays(-1)}: Bodyweight circuit Wednesday! (25 minutes)", str);
+        }
+
+        [TestMethod]
+        public void TestToStringFemaleBike()
+        {
+            CreateFemaleAthlete();
+            var str = _user.Workouts.Skip(1).First().ToString();
+            Assert.AreEqual($"{DateTime.Now.Date.AddDays(-3)}: Run around the lake (32 minutes, 3.01 miles)", str);
         }
     }
 }

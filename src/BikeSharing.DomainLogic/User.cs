@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BikeSharing.DomainLogic;
 
 namespace Training
 {
@@ -14,7 +13,7 @@ namespace Training
         public double Height { get; set; }
         public int MHR { get; }
         public double BMR { get; }
-        public Gender Sex { get; set; }
+        public Gender Gender { get; set; }
         public List<Workout> Workouts { get; set; }
         public int Id { get; set; }
 
@@ -27,7 +26,7 @@ namespace Training
             Height = height;
             MHR = 220 - age;
             BMR = BasalMetabolicRate();
-            Sex = gender;
+            Gender = gender;
         }
 
         public void AddWorkout(params Workout[] w)
@@ -64,7 +63,7 @@ namespace Training
         // heart rate when VO2Max is unknown
         private double CalculateCalories(double averageHeartRate, double totalDuration)
         {
-            switch (Sex)
+            switch (Gender)
             {
                 case Gender.Male:
                     return (-55.0969 + (0.6309 * averageHeartRate) + (0.1988 * Weight) + (0.2017 * Age) / 4.184) * 60 * totalDuration;
@@ -81,7 +80,7 @@ namespace Training
         // activity via the Harris-Benedict Equation (in kg and cm)
         private double BasalMetabolicRate()
         {
-            switch (Sex)
+            switch (Gender)
             {
                 case Gender.Male:
                     return 66.47 + (13.75 * Weight * 0.453592) + (5.003 * Height * 2.54) - (6.755 * Age);
@@ -92,217 +91,9 @@ namespace Training
             }
         }
     }
-}
 
-namespace BikeSharing.DomainLogic
-{
     public enum Gender
     {
         Male, Female
     }
 }
-
-
-
-//namespace Trainer
-//{
-//	public class Trainer
-//	{
-//		private List<WorkOut> _workOuts;
-//		public int Goal { get; set; }
-
-//		public int MilesTravelled
-//		{
-//			get
-//			{
-//				int count = 0;
-//				foreach (var work in _workOuts)
-//				{
-//					count += work.Miles;
-//				}
-//				return count;
-//			}
-//		}
-
-//		public Trainer(int goal)
-//		{
-//			_workOuts = new List<WorkOut>();
-//			Goal = goal; ;
-//		}
-
-//		public Trainer()
-//		{
-//			_workOuts = new List<WorkOut>();
-//		}
-
-//		public void RegisterWorkout(int miles, TimeSpan duration, string notes)
-//		{
-//			_workOuts.Add(new WorkOut(miles, duration, notes));
-//		}
-
-//		public bool HasMetGoal()
-//		{
-//			if (MilesTravelled == Goal)
-//			{
-//				return true;
-//			}
-//			return false;
-//		}
-
-//		public static double GetMilePace(WorkOut workout) => workout.Duration.TotalMinutes / (double)workout.Miles;
-
-//		public WorkOut GetMostMilesTraveled()
-//		{
-//			int mostMiles = 0;
-//			WorkOut FurthestWorkout = null;
-//			foreach (var workout in _workOuts)
-//			{
-//				if (workout.Miles > mostMiles)
-//				{
-//					FurthestWorkout = workout;
-//					mostMiles = workout.Miles;
-//				}
-//			}
-//			return FurthestWorkout;
-//		}
-
-//		public static Intensity GetWorkoutIntensity(WorkOut workout)
-//		{
-//			double milePace = GetMilePace(workout);
-
-//			if (workout == null)
-//				return Intensity.None;
-
-//			if (milePace < 3.5)
-//				return Intensity.Hard;
-//			else if (milePace < 6.0)
-//				return Intensity.Medium;
-//			else
-//				return Intensity.Easy;
-//		}
-
-//		public int GetWorkoutIntensityCount(Intensity desiredIntensity)
-//		{
-//			int intensityCount = 0;
-//			foreach (var workout in _workOuts)
-//			{
-//				var intensity = GetWorkoutIntensity(workout);
-//				if (desiredIntensity == intensity)
-//				{
-//					intensityCount++;
-//				}
-//			}
-//			return intensityCount;
-//		}
-
-//		public Dictionary<Intensity, int> GetAllIntensities()
-//		{
-//			Dictionary<Intensity, int> dictionary = new Dictionary<Intensity, int>();
-//			foreach (var workout in _workOuts)
-//			{
-//				var intensity = GetWorkoutIntensity(workout);
-//				if (dictionary.ContainsKey(intensity))
-//					dictionary[intensity] += 1;
-//				else
-//					dictionary.Add(intensity, 1);
-//			}
-
-//			return dictionary;
-//		}
-
-//		public (Intensity, int) MostFrequentIntensity()
-//		{
-//			var IntensityDictionary = GetAllIntensities();
-//			var highestCount = (intensity:Intensity.None, count:0);
-//			foreach (var (key, val) in IntensityDictionary)
-//			{
-//				if (val > highestCount.Item2)
-//				{
-//					highestCount = (key, val);
-//				}
-//			}
-//			return highestCount;
-//		}
-
-//		public async Task<bool> SaveIntensitySummary(string url)
-//		{
-//			using (StreamWriter writer = File.CreateText(url))
-//			{
-//				await writer.WriteLineAsync("Intensity, Count");
-//				var intensities = GetAllIntensities();
-
-//				foreach (var (k,v) in intensities)
-//				{
-//					await writer.WriteLineAsync(string.Format("{0},{1}", k, v));
-//				}
-//			}
-//			return true;
-//		}
-
-//		public List<string> TweetifyWorkouts()
-//		{
-//			var listOfTweets = new List<string>();
-//			foreach (var workout in _workOuts)
-//			{
-//				var intensity = GetWorkoutIntensity(workout);
-//				if (intensity == Intensity.Easy || intensity == Intensity.None)
-//				{
-//					listOfTweets.Add("Pumping iron at the gym!");
-//				}
-//				else
-//				{
-//					var buffer = 11;
-//					var charRemaining = 140 - (workout.Miles.ToString().Length + 
-//											   workout.Duration.Minutes.ToString().Length)
-//											   - buffer;
-
-//					var tweetReady = workout.Notes.Length < 120 ? workout.Notes : workout.Notes.Substring(0, 120);
-//					listOfTweets.Add(string.Format("{0} mi/{1} min : {2}", 
-//										workout.Miles, workout.Duration.Minutes, tweetReady));
-//				}
-//			}
-
-//			return listOfTweets;
-//		}
-//	}
-
-//	public class WorkOut
-//	{
-//		public string Notes;
-//		public int Miles { get; }
-//		public TimeSpan Duration { get; }
-
-//		public WorkOut(int miles, TimeSpan duration, string notes)
-//		{
-//			Miles = miles;
-//			Duration = duration;
-//			Notes = notes;
-//		}
-
-//		public override string ToString()
-//		{
-//            return string.Format("Workout: {0} Miles, {1} Minutes", Miles, Duration.TotalMinutes);
-//		}
-//	}
-
-//    public enum Intensity
-//    {
-//        None, Hard, Medium, Easy
-//    }
-
-//    public static class Extensions
-//    {
-//        public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> kvp, out TKey key, out TValue value)
-//        {
-//            key = kvp.Key;
-//            value = kvp.Value;
-//        }
-//    }
-
-//    public class BikeWorkout : WorkOut
-//    {
-//        public BikeWorkout(int miles, TimeSpan duration, string notes) : base(miles, duration, notes)
-//        {
-//        }
-//    }
-//}

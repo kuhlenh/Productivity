@@ -23,7 +23,7 @@ indent_size = 2
 indent_size = 2
 
 # Dotnet code style settings:
-[*.{cs, vb}]
+[*.{cs,vb}]
 # Sort using and Import directives with System.* appearing first
 dotnet_sort_system_directives_first = true
 # Avoid "this." and "Me." if not necessary
@@ -42,6 +42,25 @@ dotnet_style_collection_initializer = true:suggestion
 dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:suggestion
 dotnet_style_explicit_tuple_names = true:suggestion
+
+# Naming Conventions:
+# Pascal Casing
+dotnet_naming_symbols.method_and_property_symbols.applicable_kinds= method,property,enum
+dotnet_naming_symbols.method_and_property_symbols.applicable_accessibilities = *
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+dotnet_naming_rule.methods_and_properties_must_be_pascal_case.severity = warning
+dotnet_naming_rule.methods_and_properties_must_be_pascal_case.symbols = method_and_property_symbols
+dotnet_naming_rule.methods_and_properties_must_be_pascal_case.style = pascal_case_style
+
+# Non-public members must be lower-case
+dotnet_naming_symbols.non_public_symbols.applicable_kinds = property,method,field,event,delegate
+dotnet_naming_symbols.non_public_symbols.applicable_accessibilities = private
+dotnet_naming_style.all_lower_case_style.capitalization = all_lower
+
+dotnet_naming_rule.non_public_members_must_be_lower_case.severity = warning
+dotnet_naming_rule.non_public_members_must_be_lower_case.symbols = non_public_symbols
+dotnet_naming_rule.non_public_members_must_be_lower_case.style = all_lower_case_style
 
 # CSharp code style settings:
 [*.cs]
@@ -74,3 +93,4 @@ csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
+
