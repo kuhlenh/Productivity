@@ -74,12 +74,13 @@ namespace Training
             }
         }
 
-        public Workout GetBestWorkoutThisWeek()
+        // Get the longest duration workout at the highest intensity
+        public (Workout workout, int count) GetBestWorkoutThisWeek()
         {
             var week = Workouts.Where(w => w.Date > DateTime.Now.Date.AddDays(-7));
             var longest = week.Aggregate((w1, w2) => w1.Duration > w2.Duration ? w1 : w2);
             var vigorous = week.Where(w => w.Level == Intensity.Vigorous).Aggregate((w1, w2) => w1.Duration > w2.Duration ? w1 : w2);
-            return vigorous ?? longest;
+            return (vigorous ?? longest, week.Count());
         }
 
         // DEMO: Introduce local for weight and height calculations

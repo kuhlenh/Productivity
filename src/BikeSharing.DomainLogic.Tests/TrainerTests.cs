@@ -134,7 +134,12 @@ namespace Trainer.Tests
         {
             CreateFemaleAthlete();
             var best = _user.GetBestWorkoutThisWeek();
-            Assert.AreEqual($"{DateTime.Now.Date.AddDays(-4)}: Biking to Red Hook! (137 minutes, 14.27 miles)", best.ToString());
+            var workout = new BikeWorkout(3, new TimeSpan(2, 16, 34), 151,
+                                          DateTime.Now.AddDays(-4), 14.27,
+                                          _user,
+                                          "Biking to Red Hook!");
+            Assert.AreEqual((workout, 3), best);
         }
     }
 }
+
