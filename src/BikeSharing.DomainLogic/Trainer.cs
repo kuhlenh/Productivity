@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Training
 {
-    public class Workout
+    public class Workout2
     {
         public int id { get; set; }
         public User User { get; }
@@ -15,7 +15,7 @@ namespace Training
         public Intensity Level { get; }
         public string Notes { get; set; }
 
-        public Workout(int id, TimeSpan duration, int heartRate, DateTime date, User user, string notes)
+        public Workout2(int id, TimeSpan duration, int heartRate, DateTime date, User user, string notes)
         {
             this.id = id;
             if (user == null)
@@ -49,20 +49,5 @@ namespace Training
     public enum Intensity
     {
         Light, Moderate, Vigorous
-    }
-
-    public class BikeWorkout : Workout
-    {
-        public double Miles { get; set; }
-
-        public BikeWorkout(int id, TimeSpan duration, int heartRate, DateTime date, double miles, User user, string notes) : base(id, duration, heartRate, date, user, notes)
-        {
-            Miles = miles;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("{0}: {3} ({1:0} minutes, {2} miles)", Date.Date, Duration.TotalMinutes, Miles, Notes);
-        }
     }
 }

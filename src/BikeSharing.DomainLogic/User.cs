@@ -14,7 +14,7 @@ namespace Training
         public Gender Gender { get; set; }
         public int MHR { get; }
         public double BMR { get; }
-        public List<Workout> Workouts { get; set; }
+        public List<Workout2> Workouts { get; set; }
         public int Id { get; set; }
 
         public User(int id, string username, int age, double weight, double height, Gender gender)
@@ -29,7 +29,7 @@ namespace Training
             BMR = BasalMetabolicRate();
         }
 
-        public void AddWorkout(params Workout[] w)
+        public void AddWorkout(params Workout2[] w)
         {
             if (Workouts != null)
             {
@@ -75,7 +75,7 @@ namespace Training
         }
 
         // Get the longest duration workout at the highest intensity
-        public (Workout workout, int count) GetBestWorkoutThisWeek()
+        public (Workout2 workout, int count) GetBestWorkoutThisWeek()
         {
             var week = Workouts.Where(w => w.Date > DateTime.Now.Date.AddDays(-7));
             var longest = week.Aggregate((w1, w2) => w1.Duration > w2.Duration ? w1 : w2);
@@ -87,22 +87,17 @@ namespace Training
         // http://www.globalrph.com/harris-benedict-equation.htm
         // Determine amount of energy required to maintain normal metabolic 
         // activity via the Harris-Benedict Equation (in kg and cm)
-        private double BasalMetabolicRate()
+    private double BasalMetabolicRate()
+    {
+        switch (Gender)
         {
-            switch (Gender)
-            {
-                case Gender.Male:
-                    return 66.47 + (13.75 * Weight * 0.453592) + (5.003 * Height * 2.54) - (6.755 * Age);
-                case Gender.Female:
-                    return 655.1 + (9.563 * Weight * 0.453592) + (1.850 * Height * 2.54) - (4.676 * Age);
-                default:
-                    return 0.0;
-            }
+            case Gender.Male:
+                return 66.47 + (13.75 * Weight * 0.453592) + (5.003 * Height * 2.54) - (6.755 * Age);
+            case Gender.Female:
+                return 655.1 + (9.563 * Weight * 0.453592) + (1.850 * Height * 2.54) - (4.676 * Age);
+            default:
+                return 0.0;
         }
     }
-
-    public enum Gender
-    {
-        Male, Female
     }
 }
