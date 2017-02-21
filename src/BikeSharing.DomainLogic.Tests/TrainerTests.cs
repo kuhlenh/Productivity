@@ -92,6 +92,16 @@ namespace Trainer.Tests
         }
 
         [TestMethod]
+        public void TestAthleteTweetTodayMessageNoToday()
+        {
+            CreateMaleAthleteNoWorkout();
+            var w = new DistanceWorkout(1.5, DateTime.Now.AddDays(-4), new TimeSpan(0, 13, 0), new HeartRate(84), null);
+            athlete.AddWorkout(w);
+            var result = athlete.TweetifyTodaysWorkout();
+            Assert.AreEqual((false, null), result);
+        }
+
+        [TestMethod]
         public void TestAthleteBikeTweet()
         {
             CreateMaleAthleteNoWorkout();
@@ -99,6 +109,28 @@ namespace Trainer.Tests
             athlete.AddWorkout(w);
             var result = athlete.TweetifyTodaysWorkout();
             //Assert.AreEqual();
+        }
+
+        [TestMethod]
+        public void TestGetCaloriesBurnedNullHeartRate()
+        {
+            CreateMaleAthleteNoWorkout();
+            
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                var w = new BikeWorkout(8.21, DateTime.Now, new TimeSpan(1, 7, 23), null, "Test drove the new bike around Greenlake!");
+                athlete.AddWorkout(w);
+                var calories = athlete.GetCaloriesBurned(w);
+            });
+        }
+
+        [TestMethod]
+        public void TestGetCaloriesBurnedNullTimeSpan()
+        {
+            CreateMaleAthleteNoWorkout();
+            var w = new BikeWorkout(8.21, DateTime.Now, TimeSpan.Zero, new HeartRate(93), "Test drove the new bike around Greenlake!");
+            athlete.AddWorkout(w);
+            var calories = athlete.GetCaloriesBurned(w);
         }
 
     }

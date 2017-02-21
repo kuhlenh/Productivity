@@ -56,10 +56,10 @@ namespace Training
             this.date = datetime;
             this.duration = duration;
             this.rate = rate;
-            //if (notes == null)
-            //{
-            //    throw new ArgumentNullException(nameof(notes));
-            //}
+            if (notes == null)
+            {
+                throw new ArgumentNullException(nameof(notes));
+            }
             this.notes = notes;
         }
 
@@ -102,11 +102,15 @@ namespace Training
         private HeartRate rate;
         private string notes;
 
-        public BikeWorkout(double distance, DateTime date, TimeSpan duration,  HeartRate rate, string notes)
+        public BikeWorkout(double distance, DateTime date, TimeSpan duration, HeartRate rate, string notes)
         {
             this.date = date;
             this.distance = distance;
             this.duration = duration;
+            if (rate == null)
+            {
+                throw new ArgumentNullException(nameof(rate));
+            }
             this.rate = rate;
             this.notes = notes;
             
@@ -236,9 +240,13 @@ namespace Training
             switch (Gender)
             {
                 case Gender.Male:
-                    return (-55.0969 + (0.6309 * workout.HeartRate.GetHeartRate()) + (0.1988 * Weight) + (0.2017 * Age) / 4.184) * 60 * workout.Duration.TotalHours;
+                    return (-55.0969 + (0.6309 * workout.HeartRate.GetHeartRate()) 
+                           + (0.1988 * Weight) + (0.2017 * Age) / 4.184) 
+                           * 60 * workout.Duration.TotalHours;
                 case Gender.Female:
-                    return (-20.4022 + (0.4472 * workout.HeartRate.GetHeartRate()) - (0.1263 * Weight) + (0.074 * Age) / 4.184) * 60 * workout.Duration.TotalHours;
+                    return (-20.4022 + (0.4472 * workout.HeartRate.GetHeartRate()) 
+                           - (0.1263 * Weight) + (0.074 * Age) / 4.184) 
+                           * 60 * workout.Duration.TotalHours;
                 default:
                     return 0.0;
             }
@@ -254,54 +262,42 @@ namespace Training
         {
             if (Workouts != null)
             {
-                var today = DateTime.Now.Date;
-                var todayWorkout = Workouts.Where(w => w.Date.Date == today).First();
-                if (todayWorkout != null)
+                var todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
+                if (todaysWorkout != null)
                 {
-                    var bike = todayWorkout as IBikeWorkout;
+                    var bike = todaysWorkout as IBikeWorkout;
                     if (bike != null)
                     {
-                        var bikeMessage = string.Format(
-                            "I biked {0:0.0} miles @ {1:0.0} mph. {2}",
-                            bike.Distance, bike.Pace, bike.Notes);
-                        return (true, FitTweet(bikeMessage));
+                        var bikeMessage = $"I biked {bike.Distance:0.0} miles @ {bike.Pace:0.0} mph. {bike.Notes}";
+                        return (true, Tweetify(bikeMessage));
                     }
 
-                    var dist = todayWorkout as IDistanceWorkout;
+                    var dist = todaysWorkout as IDistanceWorkout;
                     if (dist != null)
                     {
-                        var distanceMessage = string.Format(
-                            "I crushed {0:00} miles @ {1:0.0} mph. {2}",
-                            dist.Distance, dist.Pace, dist.Notes);
-                        return (true, FitTweet(distanceMessage));
+                        var distanceMessage = $"I crushed {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}";
+                        return (true, Tweetify(distanceMessage));
                     }
 
-                    var defaultMessage = string.Format("I worked out for {0:0.0} minutes. {1}", todayWorkout.Duration.TotalMinutes, todayWorkout.Notes);
-                    return (true, FitTweet(defaultMessage));
+                    var defaultMessage = $"I worked out for {todaysWorkout.Duration.TotalMinutes:0} minutes. {todaysWorkout.Notes}";
+                    return (true, Tweetify(defaultMessage));
                 }
             }
             return (false, null);
         }
 
-        private string FitTweet(string msg)
+        private string Tweetify(string msg)
         {
-            //return msg.Length < 140 ? msg.Substring(0, 137) + "..." : msg + GetHashTags(140 - msg.Length);
-
             if (msg.Length >= 140)
-            {
                 return msg.Substring(0, 137) + "...";
-            }
             else
-            {
-                var hashtags = GetHashTags(140 - msg.Length);
-                return msg + hashtags;
-            }
+                return msg + GetHashTags(140 - msg.Length);
         }
 
-        private string GetHashTags(int charsLeft, int seed = 0)
+        private string GetHashTags(int charsLeft)
         {
             var hashes = "";
-            var random = new Random(seed);
+            var random = new Random();
             while (charsLeft > 0)
             {
                 var r = random.Next(0, HASHTAGS.Length);
