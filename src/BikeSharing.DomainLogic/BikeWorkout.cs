@@ -69,29 +69,15 @@ namespace Training
         public string Notes { get => notes; set => notes = value; }
     }
 
-    public class DistanceWorkout : IDistanceWorkout
+    public class DistanceWorkout : Workout
     {
-        private double distance;
-        private TimeSpan duration;
-        private DateTime date;
-        private HeartRate rate;
-        private string notes;
-
-        public DistanceWorkout(double distance, DateTime date, TimeSpan duration,  HeartRate heartRate, string notes)
+        public double Distance { get; set; }
+        public double Pace { get; }
+        public DistanceWorkout(DateTime datetime, TimeSpan duration, HeartRate rate, double distance, double pace, string notes) : base(datetime, duration, rate, notes)
         {
-            this.distance = distance;
-            this.duration = duration;
-            this.date = date;
-            this.rate = heartRate;
-            this.notes = notes;
+            Distance = distance;
+            Pace = distance / duration.TotalHours;
         }
-
-        public double Distance => distance;
-        public TimeSpan Duration => duration;
-        public double Pace => distance / duration.TotalHours;
-        public DateTime Date => date;
-        public IHeartRate HeartRate => rate;
-        public string Notes { get => notes; set => notes = value; }
     }
 
     public class BikeWorkout : IBikeWorkout
