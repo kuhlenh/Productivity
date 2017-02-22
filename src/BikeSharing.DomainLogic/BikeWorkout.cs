@@ -10,104 +10,51 @@ namespace Training
     {
         DateTime Date { get; }
         TimeSpan Duration { get; }
-        IHeartRate HeartRate { get; }
+        double AverageHeartRate { get; set; }
         string Notes { get; set; }
-    }
-
-    public interface IHeartRate
-    {
-        double GetHeartRate();
-    }
-
-    public interface IDistanceWorkout : IWorkout
-    {
-        double Distance { get; }
-        double Pace { get; }
-    }
-
-    public interface IWorkoutType
-    {
-        WorkoutType Type { get; }
-    }
-
-    public interface IBikeWorkout : IDistanceWorkout, IWorkout
-    {
-
-    }
-
-    public class HeartRate : IHeartRate
-    {
-        private double Rate;
-        public double GetHeartRate() => Rate;
-
-        public HeartRate(double rate) => this.Rate = rate;
-
     }
 
     public class Workout : IWorkout
     {
         private DateTime date;
         private TimeSpan duration;
-        private HeartRate rate;
+        private double averageheartrate;
         private string notes;
-
-        public Workout(DateTime datetime, TimeSpan duration, HeartRate rate, string notes)
-        {
-            this.date = datetime;
-            this.duration = duration;
-            this.rate = rate;
-            if (notes == null)
-            {
-                throw new ArgumentNullException(nameof(notes));
-            }
-            this.notes = notes;
-        }
 
         public DateTime Date => date;
         public TimeSpan Duration => duration;
-        public IHeartRate HeartRate => rate;
         public string Notes { get => notes; set => notes = value; }
+        public double AverageHeartRate { get => averageheartrate; set => averageheartrate = value; }
+
+        public Workout(DateTime datetime, TimeSpan duration, double rate, string notes)
+        {
+            this.date = datetime;
+            this.duration = duration;
+            this.AverageHeartRate = rate;
+            this.notes = notes;
+        }
+
     }
 
     public class DistanceWorkout : Workout
     {
         public double Distance { get; set; }
         public double Pace { get; }
-        public DistanceWorkout(DateTime datetime, TimeSpan duration, HeartRate rate, double distance, double pace, string notes) : base(datetime, duration, rate, notes)
+        public DistanceWorkout(double distance, DateTime datetime, TimeSpan duration, double rate, string notes) : base(datetime, duration, rate, notes)
         {
             Distance = distance;
             Pace = distance / duration.TotalHours;
         }
     }
 
-    public class BikeWorkout : IBikeWorkout
+    public class BikeWorkout : DistanceWorkout
     {
-        private double distance;
-        private TimeSpan duration;
-        private DateTime date;
-        private HeartRate rate;
-        private string notes;
+        public WorkoutType Type { get; set; }
 
-        public BikeWorkout(double distance, DateTime date, TimeSpan duration, HeartRate rate, string notes)
+        public BikeWorkout(WorkoutType type, double distance, DateTime datetime, TimeSpan duration, double rate, string notes) : base(distance, datetime, duration, rate, notes)
         {
-            this.date = date;
-            this.distance = distance;
-            this.duration = duration;
-            if (rate == null)
-            {
-                throw new ArgumentNullException(nameof(rate));
-            }
-            this.rate = rate;
-            this.notes = notes;
-            
+            Type = type;
         }
-
-        public double Distance => distance;
-        public TimeSpan Duration => duration;
-        public double Pace => distance / duration.TotalHours;
-        public DateTime Date => date;
-        public IHeartRate HeartRate => rate;
-        public string Notes { get => notes; set => notes = value; }
     }
 
     public class Athlete
@@ -226,11 +173,11 @@ namespace Training
             switch (Gender)
             {
                 case Gender.Male:
-                    return (-55.0969 + (0.6309 * workout.HeartRate.GetHeartRate()) 
+                    return (-55.0969 + (0.6309 * workout.AverageHeartRate) 
                            + (0.1988 * Weight) + (0.2017 * Age) / 4.184) 
                            * 60 * workout.Duration.TotalHours;
                 case Gender.Female:
-                    return (-20.4022 + (0.4472 * workout.HeartRate.GetHeartRate()) 
+                    return (-20.4022 + (0.4472 * workout.AverageHeartRate) 
                            - (0.1263 * Weight) + (0.074 * Age) / 4.184) 
                            * 60 * workout.Duration.TotalHours;
                 default:
@@ -241,7 +188,7 @@ namespace Training
         public IWorkout GetWeeksBestWorkout()
         {
             var week = Workouts.Where(w => w.Date > DateTime.Now.Date.AddDays(-7));
-            return week.Aggregate((w1, w2) => w1.HeartRate.GetHeartRate() > w2.HeartRate.GetHeartRate() ? w1 : w2);
+            return week.Aggregate((w1, w2) => w1.AverageHeartRate > w2.AverageHeartRate ? w1 : w2);
         }
 
         public (bool success, string message) TweetifyTodaysWorkout()
@@ -251,14 +198,14 @@ namespace Training
                 var todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
                 if (todaysWorkout != null)
                 {
-                    var bike = todaysWorkout as IBikeWorkout;
+                    var bike = todaysWorkout as BikeWorkout;
                     if (bike != null)
                     {
                         var bikeMessage = $"I biked {bike.Distance:0.0} miles @ {bike.Pace:0.0} mph. {bike.Notes}";
                         return (true, Tweetify(bikeMessage));
                     }
 
-                    var dist = todaysWorkout as IDistanceWorkout;
+                    var dist = todaysWorkout as DistanceWorkout;
                     if (dist != null)
                     {
                         var distanceMessage = $"I crushed {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}";

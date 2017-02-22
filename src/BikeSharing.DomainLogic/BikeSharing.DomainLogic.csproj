@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="BikeWorkout.cs" />
     <Compile Include="Gender.cs" />
-    <Compile Include="Trainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
