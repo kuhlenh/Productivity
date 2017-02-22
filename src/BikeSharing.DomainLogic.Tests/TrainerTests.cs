@@ -26,7 +26,7 @@ namespace Trainer.Tests
         public void CreateFemaleAthleteWithWorkouts()
         {
             athlete = new Athlete("kaseyu", Gender.Female, 25, 155, 71);
-            var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, new TimeSpan(1, 7, 23), 106, "Test drove the new bike around Greenlake!");
+            var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.FromMinutes(67), 106, "Test drove the new bike around Greenlake!");
             var w2 = new Workout(DateTime.Now.AddDays(-2), new TimeSpan(0, 14, 3), 124, "Single leg squats FTW!");
             athlete.AddWorkout(w, w2);
         }
@@ -34,7 +34,7 @@ namespace Trainer.Tests
         public void CreateMaleAthleteWithWorkouts()
         {
             athlete = new Athlete("eweber", Gender.Male, 27, 201, 72);
-            var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, new TimeSpan(1, 7, 23), 113, "Learning how to bike in the streets :O");
+            var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.FromMinutes(67), 113, "Learning how to bike in the streets :O");
             var w2 = new Workout(DateTime.Now.AddDays(-4), new TimeSpan(1, 2, 43), 132, "500 lb squat day. #gainz");
             athlete.AddWorkout(w, w2);
         }
@@ -43,7 +43,7 @@ namespace Trainer.Tests
         public void TestAthleteAddWorkout()
         {
             CreateFemaleAthleteWithWorkouts();
-            var w = new DistanceWorkout(.99, DateTime.Now.AddDays(-6), new TimeSpan(0, 20, 24), 125, "Meh. Light jog on treadmill...");
+            var w = new DistanceWorkout(.99, DateTime.Now.AddDays(-6), TimeSpan.FromMinutes(20), 125, "Meh. Light jog on treadmill...");
             athlete.AddWorkout(w);
             Assert.AreEqual(3, athlete.Workouts.Count);
         }
@@ -56,19 +56,11 @@ namespace Trainer.Tests
         }
 
         [TestMethod]
-        public void TestAthleteTweetTodaySuccess()
-        {
-            CreateFemaleAthleteWithWorkouts();
-            var result = athlete.TweetTodaysWorkout();
-            Assert.AreEqual(true, result.success);
-        }
-
-        [TestMethod]
         public void TestAthleteTweetTodayMessage()
         {
             CreateFemaleAthleteWithWorkouts();
             var result = athlete.TweetTodaysWorkout();
-            Assert.AreEqual(120, result.message.Length, 20);
+            Assert.AreEqual(120, result.Length, 20);
         }
 
         [TestMethod]
@@ -77,38 +69,58 @@ namespace Trainer.Tests
             CreateFemaleAthleteNoWorkout();
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                var w = new Workout(DateTime.Now, new TimeSpan(0, 13, 0), 84, null);
+                var w = new Workout(DateTime.Now, TimeSpan.FromMinutes(13), 84, null);
                 athlete.AddWorkout(w);
                 athlete.TweetTodaysWorkout();
             });
         }
 
         [TestMethod]
+        public void TestAthleteTweetTodayBikeWorkout()
+        {
+            CreateFemaleAthleteNoWorkout();
+            var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.FromMinutes(67), 125, "Learning how to bike in the streets! :O");
+            athlete.AddWorkout(w);
+            var result = athlete.TweetTodaysWorkout();
+            Assert.AreEqual(120, result.Length, 20);
+        }
+
+        //[TestMethod]
+        //public void TestAthleteTweetTodayDistanceWorkout()
+        //{
+        //    CreateFemaleAthleteNoWorkout();
+        //    var w = new DistanceWorkout(.99, DateTime.Now, TimeSpan.FromMinutes(20), 125, "Meh. Light jog on treadmill...");
+        //    athlete.AddWorkout(w);
+        //    var result = athlete.TweetTodaysWorkout();
+        //    Assert.AreEqual(120, result.Length,20);
+        //}
+
+        [TestMethod]
         public void TestAthleteTweetTodayMessageEmpty()
         {
             CreateMaleAthleteNoWorkout();
             var result = athlete.TweetTodaysWorkout();
-            Assert.AreEqual((false, null), result);
+            Assert.AreEqual(null, result);
         }
 
         [TestMethod]
         public void TestAthleteTweetTodayMessageNoToday()
         {
             CreateMaleAthleteNoWorkout();
-            var w = new DistanceWorkout(1.5, DateTime.Now.AddDays(-8), new TimeSpan(0, 13, 0), 84, "");
+            var w = new DistanceWorkout(1.5, DateTime.Now.AddDays(-8), TimeSpan.FromMinutes(13), 84, "");
             athlete.AddWorkout(w);
             var result = athlete.TweetTodaysWorkout();
-            Assert.AreEqual((false, null), result);
+            Assert.AreEqual(null, result);
         }
 
         [TestMethod]
         public void TestAthleteBikeTweet()
         {
             CreateMaleAthleteNoWorkout();
-            var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, new TimeSpan(1, 7, 23), 113, "Learning how to bike in the streets :O");
+            var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.FromMinutes(67), 1323, "Beautiful day to bike! Jk, fam. It's raining out here...but I enjoyed teaching my girlfriend how to be street smart when riding bikes. STP 2018 here we come!");
             athlete.AddWorkout(w);
             var result = athlete.TweetTodaysWorkout();
-            //Assert.AreEqual();
+            Assert.AreEqual(120, result.Length, 20);
         }
 
         [TestMethod]
@@ -119,13 +131,31 @@ namespace Trainer.Tests
             athlete.AddWorkout(w);
             var calories = athlete.GetCaloriesBurned(w);
         }
+
+        [TestMethod]
+        public void TestGetBestWeekWorkout()
+        {
+            CreateFemaleAthleteWithWorkouts();
+            var bestWorkout = athlete.GetWeeksBestWorkout();
+            var actual = athlete.Workouts.Where(w => w.Date.Date == DateTime.Now.Date).First();
+            Assert.AreEqual(actual, bestWorkout.workout);
+            Assert.AreEqual(527.066260994, bestWorkout.calories, .000001);
+        }
+
+        [TestMethod]
+        public void TestTweetBestWorkoutWeek()
+        {
+            CreateMaleAthleteWithWorkouts();
+            var tweet = athlete.TweetBestWorkoutOfWeek();
+            Assert.AreEqual(120, tweet.Length, 20);
+        }
     }
 
 
     [TestClass]
     public class TestIWorkout
     {
-        IWorkout _workout;
+        Workout _workout;
 
         public void Create(string workoutName)
         {
@@ -146,19 +176,19 @@ namespace Trainer.Tests
             }
         }
 
-        private IWorkout CreateBikeWorkout()
+        private Workout CreateBikeWorkout()
         {
-            return new BikeWorkout(WorkoutType.Outdoor, 21.6, DateTime.Now.AddDays(-5), new TimeSpan(1, 23, 14),  117, "Biking to Red Hook Brewery on the Burke-Gilman. What a day to be alive!");
+            return new BikeWorkout(WorkoutType.Outdoor, 21.6, DateTime.Now.AddDays(-5), TimeSpan.FromMinutes(83),  117, "Biking to Red Hook Brewery on the Burke-Gilman. What a day to be alive!");
         }
 
-        private IWorkout CreateDistanceWorkout()
+        private Workout CreateDistanceWorkout()
         {
-            return new DistanceWorkout(5.2, DateTime.Now.AddDays(-2),new TimeSpan(0, 37, 20), 112, "5K run around Greenlake with the bf ;)");
+            return new DistanceWorkout(5.2, DateTime.Now.AddDays(-2), TimeSpan.FromMinutes(37), 112, "5K run around Greenlake with the bf ;)");
         }
 
-        private IWorkout CreateWorkout()
+        private Workout CreateWorkout()
         {
-            return new Workout(DateTime.Now, new TimeSpan(0,25,0), 93, "Pumpin' some iron.");
+            return new Workout(DateTime.Now, TimeSpan.FromMinutes(25), 93, "Pumpin' some iron.");
         }
 
         [TestMethod]
@@ -166,7 +196,7 @@ namespace Trainer.Tests
         {
             Create("bike");
             var bike = (BikeWorkout)_workout;
-            Assert.AreEqual(15.570684, bike.Pace, .000001);
+            Assert.AreEqual(15.6144578, bike.Pace, .000001);
         }
 
         [TestMethod]
@@ -190,7 +220,7 @@ namespace Trainer.Tests
         {
             Create("distance");
             var distance = (DistanceWorkout)_workout;
-            Assert.AreEqual(8.3571428, distance.Pace, .000001);
+            Assert.AreEqual(8.4324324, distance.Pace, .000001);
         }
 
         [TestMethod]

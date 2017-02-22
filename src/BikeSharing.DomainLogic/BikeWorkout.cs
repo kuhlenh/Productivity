@@ -6,38 +6,19 @@ using BikeSharing.DomainLogic;
 
 namespace Training
 {
-    //public interface IWorkout
-    //{
-    //    DateTime Date { get; }
-    //    TimeSpan Duration { get; }
-    //    double AverageHeartRate { get; set; }
-    //    string Notes { get; set; }
-
-    //    string GetSummary();
-    //}
-
     public class Workout
     {
-        private DateTime date;
-        private TimeSpan duration;
-        private double averageheartrate;
-        private string notes;
+        public DateTime Date { get; set; }
+        public TimeSpan Duration { get; set; }
+        public double AverageHeartRate { get; set; }
+        public string Notes;
 
-        public DateTime Date => date;
-        public TimeSpan Duration => duration;
-        public string Notes { get => notes; set => notes = value; }
-        public double AverageHeartRate { get => averageheartrate; set => averageheartrate = value; }
-
-        public Workout(DateTime datetime, TimeSpan duration, double rate, string notes)
+        public Workout(DateTime date, TimeSpan duration, double averageHeartRate, string notes)
         {
-            this.date = datetime;
-            this.duration = duration;
-            this.AverageHeartRate = rate;
-            //if (notes == null)
-            //{
-            //    throw new ArgumentNullException(nameof(notes));
-            //}
-            this.notes = notes;
+            Date = date;
+            Duration = duration;
+            AverageHeartRate = averageHeartRate;
+            Notes = notes;
         }
 
         public virtual string GetSummary()
@@ -146,7 +127,7 @@ namespace Training
         public double Weight { get; set; }
         public double Height { get; set; }
         public double BasalMetabolicRate { get; }
-        public List<IWorkout> Workouts { get; set; }
+        public List<Workout> Workouts { get; set; }
 
         public Athlete(string username, Gender gender, int age, double weight, double height)
         {
@@ -158,7 +139,7 @@ namespace Training
             BasalMetabolicRate = GetBasalMetabolicRate();
         }
 
-        public Athlete(string username, Gender gender, int age, double weight, double height, List<IWorkout> workouts)
+        public Athlete(string username, Gender gender, int age, double weight, double height, List<Workout> workouts)
         {
             Username = username;
             Gender = gender;
@@ -169,7 +150,7 @@ namespace Training
             Workouts = workouts;
         }
 
-        public void AddWorkout(params IWorkout[] w)
+        public void AddWorkout(params Workout[] w)
         {
             if (Workouts != null)
             {
@@ -194,7 +175,7 @@ namespace Training
             }
         }
 
-        public double GetCaloriesBurned(IWorkout workout)
+        public double GetCaloriesBurned(Workout workout)
         {
             //var a = (Gender)5;
             switch (Gender)
@@ -212,13 +193,24 @@ namespace Training
             }
         }
 
-        public IWorkout GetWeeksBestWorkout()
+        public (Workout workout, double calories) GetWeeksBestWorkout()
         {
-            var week = Workouts.Where(w => w.Date > DateTime.Now.Date.AddDays(-7));
-            return week.Aggregate((w1, w2) => w1.AverageHeartRate > w2.AverageHeartRate ? w1 : w2);
+            var lastWeekWorkouts = Workouts.Where(w => w.Date > DateTime.Now.Date.AddDays(-7));
+            var workoutWithMostCalsBurned = lastWeekWorkouts.Aggregate((w1, w2) => GetCaloriesBurned(w1) > GetCaloriesBurned(w2) ? w1 : w2);
+            return (workoutWithMostCalsBurned, GetCaloriesBurned(workoutWithMostCalsBurned));
         }
 
-        public (bool success, string message) TweetTodaysWorkout()
+        public string TweetBestWorkoutOfWeek()
+        {
+            var best = GetWeeksBestWorkout();
+            if (best.Item2 > 200)
+            {
+                return Tweetify(best.Item1.Notes);
+            }
+            return Tweetify("Casual workout week...");
+        }
+
+        public string TweetTodaysWorkout()
         {
             if (Workouts != null)
             {
@@ -229,21 +221,21 @@ namespace Training
                     if (bike != null)
                     {
                         var bikeMessage = $"I biked {bike.Distance:0.0} miles @ {bike.Pace:0.0} mph. {bike.Notes}";
-                        return (true, Tweetify(bikeMessage));
+                        return Tweetify(bikeMessage);
                     }
 
                     var dist = todaysWorkout as DistanceWorkout;
                     if (dist != null)
                     {
                         var distanceMessage = $"I crushed {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}";
-                        return (true, Tweetify(distanceMessage));
+                        return Tweetify(distanceMessage);
                     }
 
-                    var defaultMessage = $"I worked out for {todaysWorkout.Duration.TotalMinutes:0} minutes. {todaysWorkout.Notes}";
-                    return (true, Tweetify(defaultMessage));
+                    var defaultMesasge = todaysWorkout.Notes.Length <= 140 ? todaysWorkout.Notes : Tweetify(todaysWorkout.Notes);
+                    return defaultMesasge;
                 }
             }
-            return (false, null);
+            return null;
         }
 
         private string Tweetify(string msg)
@@ -261,15 +253,15 @@ namespace Training
             while (charsLeft > 0)
             {
                 var r = random.Next(0, HASHTAGS.Length);
-                var hashtag = HASHTAGS[r];
+                var hashtag = " " + HASHTAGS[r];
                 if (hashtag.Length > charsLeft)
                 {
-                    charsLeft = 0;
+                    charsLeft = -1;
                 }
                 else
                 {
-                    hashes += " " + hashtag;
-                    charsLeft -= hashes.Length;
+                    charsLeft -= hashtag.Length;
+                    hashes += hashtag;
                 }
             }
             return hashes;
