@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BikeSharing.DomainLogic;
 
 namespace Training
 {
+    //public interface IWorkout
+    //{
+    //    DateTime Date { get; }
+    //    TimeSpan Duration { get; }
+    //    double AverageHeartRate { get; set; }
+    //    string Notes { get; set; }
 
-    public interface IWorkout
-    {
-        DateTime Date { get; }
-        TimeSpan Duration { get; }
-        double AverageHeartRate { get; set; }
-        string Notes { get; set; }
-    }
+    //    string GetSummary();
+    //}
 
-    public class Workout : IWorkout
+    public class Workout
     {
         private DateTime date;
         private TimeSpan duration;
@@ -31,9 +33,19 @@ namespace Training
             this.date = datetime;
             this.duration = duration;
             this.AverageHeartRate = rate;
+            //if (notes == null)
+            //{
+            //    throw new ArgumentNullException(nameof(notes));
+            //}
             this.notes = notes;
         }
 
+        public virtual string GetSummary()
+        {
+            var truncatedNotes = this.Notes.Length <= 24 ? this.Notes : this.Notes.Substring(0, 21) + "...";
+            return string.Format("{0} \n {1:0.0} min \n {2:0.0} avg <3 \n {3}",
+                           Date.Date, Duration.TotalMinutes, AverageHeartRate, truncatedNotes);
+        }
     }
 
     public class DistanceWorkout : Workout
@@ -45,6 +57,13 @@ namespace Training
             Distance = distance;
             Pace = distance / duration.TotalHours;
         }
+
+        public override string GetSummary()
+        {
+            var truncatedNotes = this.Notes.Length <= 24 ? this.Notes : this.Notes.Substring(0, 21) + "...";
+            return string.Format("{0} \n {1:0.0} min \n {2:0.0} mi \n {3:0.0} mph \n {4:0.0} avg <3 \n {5}",
+                           Date.Date, Duration.TotalMinutes, Distance, Pace, AverageHeartRate, truncatedNotes);
+        }
     }
 
     public class BikeWorkout : DistanceWorkout
@@ -55,7 +74,15 @@ namespace Training
         {
             Type = type;
         }
+
+        public override string GetSummary()
+        {
+            var truncatedNotes = this.Notes.Length <= 24 ? this.Notes : this.Notes.Substring(0, 21) + "...";
+            return string.Format("{0} \n {1:0.0} min \n {2:0.0} mi \n ({3}) \n {4:0.0} mph \n {5:0.0} avg <3 \n {6}",
+                           Date.Date, Duration.TotalMinutes, Distance, Type, Pace, AverageHeartRate, truncatedNotes);
+        }
     }
+    
 
     public class Athlete
     {
@@ -191,7 +218,7 @@ namespace Training
             return week.Aggregate((w1, w2) => w1.AverageHeartRate > w2.AverageHeartRate ? w1 : w2);
         }
 
-        public (bool success, string message) TweetifyTodaysWorkout()
+        public (bool success, string message) TweetTodaysWorkout()
         {
             if (Workouts != null)
             {
@@ -256,6 +283,5 @@ namespace BikeSharing.DomainLogic
     {
         Indoor, Outdoor
     }
-
 
 }

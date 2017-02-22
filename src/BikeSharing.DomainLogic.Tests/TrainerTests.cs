@@ -59,7 +59,7 @@ namespace Trainer.Tests
         public void TestAthleteTweetTodaySuccess()
         {
             CreateFemaleAthleteWithWorkouts();
-            var result = athlete.TweetifyTodaysWorkout();
+            var result = athlete.TweetTodaysWorkout();
             Assert.AreEqual(true, result.success);
         }
 
@@ -67,7 +67,7 @@ namespace Trainer.Tests
         public void TestAthleteTweetTodayMessage()
         {
             CreateFemaleAthleteWithWorkouts();
-            var result = athlete.TweetifyTodaysWorkout();
+            var result = athlete.TweetTodaysWorkout();
             Assert.AreEqual(120, result.message.Length, 20);
         }
 
@@ -79,7 +79,7 @@ namespace Trainer.Tests
             {
                 var w = new Workout(DateTime.Now, new TimeSpan(0, 13, 0), 84, null);
                 athlete.AddWorkout(w);
-                athlete.TweetifyTodaysWorkout();
+                athlete.TweetTodaysWorkout();
             });
         }
 
@@ -87,7 +87,7 @@ namespace Trainer.Tests
         public void TestAthleteTweetTodayMessageEmpty()
         {
             CreateMaleAthleteNoWorkout();
-            var result = athlete.TweetifyTodaysWorkout();
+            var result = athlete.TweetTodaysWorkout();
             Assert.AreEqual((false, null), result);
         }
 
@@ -95,9 +95,9 @@ namespace Trainer.Tests
         public void TestAthleteTweetTodayMessageNoToday()
         {
             CreateMaleAthleteNoWorkout();
-            var w = new DistanceWorkout(1.5, DateTime.Now.AddDays(-4), new TimeSpan(0, 13, 0), 84, null);
+            var w = new DistanceWorkout(1.5, DateTime.Now.AddDays(-8), new TimeSpan(0, 13, 0), 84, "");
             athlete.AddWorkout(w);
-            var result = athlete.TweetifyTodaysWorkout();
+            var result = athlete.TweetTodaysWorkout();
             Assert.AreEqual((false, null), result);
         }
 
@@ -107,7 +107,7 @@ namespace Trainer.Tests
             CreateMaleAthleteNoWorkout();
             var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, new TimeSpan(1, 7, 23), 113, "Learning how to bike in the streets :O");
             athlete.AddWorkout(w);
-            var result = athlete.TweetifyTodaysWorkout();
+            var result = athlete.TweetTodaysWorkout();
             //Assert.AreEqual();
         }
 
@@ -208,6 +208,25 @@ namespace Trainer.Tests
             var workout = (Workout)_workout;
             Assert.AreEqual(18, workout.Notes.Length);
         }
-    } 
-}
 
+        [TestMethod]
+        public void TestWorkoutSummary()
+        {
+            Create("workout");
+            var workout = (Workout)_workout;
+            var expected = $"{DateTime.Now.Date} \n 25.0 min \n 93.0 avg <3 \n Pumpin' some iron.";
+            Assert.AreEqual(expected, workout.GetSummary());
+        }
+
+        [TestMethod]
+        public void TestBikeWorkoutSummaryNoNotes()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => 
+            {
+                var workout = new BikeWorkout(WorkoutType.Outdoor, 21.6, DateTime.Now.AddDays(-5), new TimeSpan(1, 23, 14), 117, null);
+                var expected = $"{DateTime.Now.AddDays(-5).Date} \n 83.2 min \n 21.6 mi \n 15.5 mph \n 117.0 avg <3 \n \n";
+                var actual = workout.GetSummary();
+            });
+        }
+    }
+}
