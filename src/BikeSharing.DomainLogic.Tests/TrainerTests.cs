@@ -238,25 +238,5 @@ namespace Trainer.Tests
             var workout = (Workout)_workout;
             Assert.AreEqual(18, workout.Notes.Length);
         }
-
-        [TestMethod]
-        public void TestWorkoutSummary()
-        {
-            Create("workout");
-            var workout = (Workout)_workout;
-            var expected = $"{DateTime.Now.Date} \n 25.0 min \n 93.0 avg <3 \n Pumpin' some iron.";
-            Assert.AreEqual(expected, workout.GetSummary());
-        }
-
-        [TestMethod]
-        public void TestBikeWorkoutSummaryNoNotes()
-        {
-            Assert.ThrowsException<ArgumentNullException>(() => 
-            {
-                var workout = new BikeWorkout(WorkoutType.Outdoor, 21.6, DateTime.Now.AddDays(-5), new TimeSpan(1, 23, 14), 117, null);
-                var expected = $"{DateTime.Now.AddDays(-5).Date} \n 83.2 min \n 21.6 mi \n 15.5 mph \n 117.0 avg <3 \n \n";
-                var actual = workout.GetSummary();
-            });
-        }
     }
 }
