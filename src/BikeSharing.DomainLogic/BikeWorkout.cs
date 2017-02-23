@@ -183,7 +183,7 @@ namespace Training
             return Tweetify("Casual workout week...");
         }
 
-        public string TweetTodaysWorkout()
+        public string tweetTodaysWorkout()
         {
             if (Workouts != null)
             {
