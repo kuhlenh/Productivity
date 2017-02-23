@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using BikeSharing.DomainLogic;
 
 namespace Training
 {
     public class Workout
     {
-        public DateTime Date { get; set; }
+        public DateTime Date { get; }
         public TimeSpan Duration { get; set; }
         public double AverageHeartRate { get; set; }
         public string Notes;
@@ -28,9 +27,10 @@ namespace Training
 
     public class DistanceWorkout : Workout
     {
-        public double Distance { get; set; }
+        public double Distance { get; }
         public double Pace { get; }
-        public DistanceWorkout(double distance, DateTime datetime, TimeSpan duration, double rate, string notes) : base(datetime, duration, rate, notes)
+        public DistanceWorkout(double distance, DateTime datetime, TimeSpan duration, double rate, string notes) 
+            : base(datetime, duration, rate, notes)
         {
             Distance = distance;
             Pace = distance / duration.TotalHours;
@@ -39,9 +39,10 @@ namespace Training
 
     public class BikeWorkout : DistanceWorkout
     {
-        public WorkoutType Type { get; set; }
+        public WorkoutType Type { get; }
 
-        public BikeWorkout(WorkoutType type, double distance, DateTime datetime, TimeSpan duration, double rate, string notes) : base(distance, datetime, duration, rate, notes)
+        public BikeWorkout(WorkoutType type, double distance, DateTime datetime, TimeSpan duration, double rate, string notes) 
+            : base(distance, datetime, duration, rate, notes)
         {
             Type = type;
         }
@@ -49,6 +50,9 @@ namespace Training
 
     public class Athlete
     {
+        private const int TweetSize = 140;
+        private const int GoodCalorieBurn = 200;
+        #region Hashtags
         private readonly string[] HASHTAGS = new string[]{
 "#transformationtuesday",
 "#mcm",
@@ -102,13 +106,14 @@ namespace Training
 "#staypositive",
 "#noexcuses"
     };
+        #endregion
 
-        public string Username { get; set; }
+        public string Username { get; }
         public Gender Gender { get; set; }
         public int Age { get; set; }
         public double Weight { get; set; }
         public double Height { get; set; }
-        public double BasalMetabolicRate { get; }
+        public double BasalMetabolicRate { get => GetBasalMetabolicRate(); }
         public List<Workout> Workouts { get; set; }
 
         public Athlete(string username, Gender gender, int age, double weight, double height)
@@ -118,40 +123,31 @@ namespace Training
             Age = age;
             Weight = weight;
             Height = height;
-            BasalMetabolicRate = GetBasalMetabolicRate();
         }
 
-        public Athlete(string username, Gender gender, int age, double weight, double height, List<Workout> workouts)
-        {
-            Username = username;
-            Gender = gender;
-            Age = age;
-            Weight = weight;
-            Height = height;
-            BasalMetabolicRate = GetBasalMetabolicRate();
-            Workouts = workouts;
-        }
-
-        public void AddWorkout(params Workout[] w)
+        public void AddWorkout(params Workout[] workouts)
         {
             if (Workouts != null)
             {
-                Workouts.AddRange(w);
+                Workouts.AddRange(workouts);
             }
             else
             {
-                Workouts = w.ToList();
+                Workouts = workouts.ToList();
             }
         }
 
         private double GetBasalMetabolicRate()
         {
+            var WeightInKg = Weight * 0.453592;
+            var HeightInCm = Height * 2.54;
+
             switch (Gender)
             {
                 case Gender.Male:
-                    return 66.47 + (13.75 * Weight * 0.453592) + (5.003 * Height * 2.54) - (6.755 * Age);
+                    return 66.47 + (13.75 * WeightInKg) + (5.003 * HeightInCm) - (6.755 * Age);
                 case Gender.Female:
-                    return 655.1 + (9.563 * Weight * 0.453592) + (1.850 * Height * 2.54) - (4.676 * Age);
+                    return 655.1 + (9.563 * WeightInKg) + (1.850 * HeightInCm) - (4.676 * Age);
                 default:
                     return 0.0;
             }
@@ -159,16 +155,15 @@ namespace Training
 
         public double GetCaloriesBurned(Workout workout)
         {
-            //var a = (Gender)5;
             switch (Gender)
             {
                 case Gender.Male:
-                    return (-55.0969 + (0.6309 * workout.AverageHeartRate) 
-                           + (0.1988 * Weight) + (0.2017 * Age) / 4.184) 
+                    return (-55.0969 + (0.6309 * workout.AverageHeartRate)
+                           + (0.1988 * Weight) + (0.2017 * Age) / 4.184)
                            * 60 * workout.Duration.TotalHours;
                 case Gender.Female:
-                    return (-20.4022 + (0.4472 * workout.AverageHeartRate) 
-                           - (0.1263 * Weight) + (0.074 * Age) / 4.184) 
+                    return (-20.4022 + (0.4472 * workout.AverageHeartRate)
+                           - (0.1263 * Weight) + (0.074 * Age) / 4.184)
                            * 60 * workout.Duration.TotalHours;
                 default:
                     return 0.0;
@@ -185,7 +180,7 @@ namespace Training
         public string TweetBestWorkoutOfWeek()
         {
             var best = GetWeeksBestWorkout();
-            if (best.Item2 > 200)
+            if (best.Item2 > GoodCalorieBurn)
             {
                 return Tweetify(best.Item1.Notes);
             }
@@ -211,7 +206,7 @@ namespace Training
                         return Tweetify($"I ran {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}");
                     }
 
-                    return todaysWorkout.Notes.Length <= 140 ? todaysWorkout.Notes : Tweetify(todaysWorkout.Notes);
+                    return todaysWorkout.Notes.Length <= TweetSize ? todaysWorkout.Notes : Tweetify(todaysWorkout.Notes);
                 }
             }
             return null;
@@ -219,10 +214,10 @@ namespace Training
 
         private string Tweetify(string msg)
         {
-            if (msg.Length >= 140)
-                return msg.Substring(0, 137) + "...";
+            if (msg.Length >= TweetSize)
+                return msg.Substring(0, TweetSize-3) + "...";
             else
-                return msg + GetHashTags(140 - msg.Length);
+                return msg + GetHashTags(TweetSize - msg.Length);
         }
 
         private string GetHashTags(int charsLeft)
