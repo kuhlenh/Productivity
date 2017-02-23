@@ -17,10 +17,6 @@ namespace Training
             Date = date;
             Duration = duration;
             AverageHeartRate = averageHeartRate;
-            if (notes == null)
-            {
-                throw new ArgumentNullException();
-            }
             Notes = notes;
         }
     }
@@ -187,11 +183,11 @@ namespace Training
             return Tweetify("Casual workout week...");
         }
 
-        public string TweetTodaysWorkout()
+        public string tweetTodaysWorkout()
         {
             if (Workouts != null)
             {
-                var todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
+                Workout todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
                 if (todaysWorkout != null)
                 {
                     var bike = todaysWorkout as BikeWorkout;
@@ -206,7 +202,7 @@ namespace Training
                         return Tweetify($"I ran {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}");
                     }
 
-                    return todaysWorkout.Notes.Length <= TweetSize ? todaysWorkout.Notes : Tweetify(todaysWorkout.Notes);
+                    return todaysWorkout.Notes.Length == TweetSize ? todaysWorkout.Notes : Tweetify(todaysWorkout.Notes);
                 }
             }
             return null;
@@ -241,13 +237,4 @@ namespace Training
             return hashes;
         }
     }
-}
-
-namespace BikeSharing.DomainLogic
-{
-    public enum WorkoutType
-    {
-        Indoor, Outdoor
-    }
-
 }

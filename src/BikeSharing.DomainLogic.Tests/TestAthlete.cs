@@ -58,7 +58,7 @@ namespace Trainer.Tests
         public void TestAthleteTweetTodayMessage()
         {
             var athlete = CreateFemaleAthleteWithWorkouts();
-            var result = athlete.TweetTodaysWorkout();
+            var result = athlete.tweetTodaysWorkout();
             Assert.AreEqual(120, result.Length, 20);
         }
 
@@ -70,7 +70,7 @@ namespace Trainer.Tests
             {
                 var w = new Workout(DateTime.Now, TimeSpan.FromMinutes(13), 84, null);
                 athlete.AddWorkout(w);
-                athlete.TweetTodaysWorkout();
+                athlete.tweetTodaysWorkout();
             });
         }
 
@@ -80,7 +80,17 @@ namespace Trainer.Tests
             var athlete = CreateFemaleAthleteNoWorkout();
             var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.FromMinutes(67), 125, "Learning how to bike in the streets! :O");
             athlete.AddWorkout(w);
-            var result = athlete.TweetTodaysWorkout();
+            var result = athlete.tweetTodaysWorkout();
+            Assert.AreEqual(120, result.Length, 20);
+        }
+
+        [TestMethod]
+        public void TestAthleteTweetTodayWorkout()
+        {
+            var athlete = CreateFemaleAthleteNoWorkout();
+            var w = new Workout(DateTime.Now, TimeSpan.FromMinutes(67), 125, "A squat a day keeps the doctor away!");
+            athlete.AddWorkout(w);
+            var result = athlete.tweetTodaysWorkout();
             Assert.AreEqual(120, result.Length, 20);
         }
 
@@ -88,7 +98,7 @@ namespace Trainer.Tests
         public void TestAthleteTweetTodayMessageEmpty()
         {
             var athlete = CreateMaleAthleteNoWorkout();
-            var result = athlete.TweetTodaysWorkout();
+            var result = athlete.tweetTodaysWorkout();
             Assert.AreEqual(null, result);
         }
 
@@ -98,7 +108,7 @@ namespace Trainer.Tests
             var athlete = CreateMaleAthleteNoWorkout();
             var w = new DistanceWorkout(1.5, DateTime.Now.AddDays(-8), TimeSpan.FromMinutes(13), 84, "");
             athlete.AddWorkout(w);
-            var result = athlete.TweetTodaysWorkout();
+            var result = athlete.tweetTodaysWorkout();
             Assert.AreEqual(null, result);
         }
 
@@ -108,7 +118,7 @@ namespace Trainer.Tests
             var athlete = CreateMaleAthleteNoWorkout();
             var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.FromMinutes(67), 1323, "Beautiful day to bike! Jk, fam. It's raining out here...but I enjoyed teaching my girlfriend how to be street smart when riding bikes. STP 2018 here we come!");
             athlete.AddWorkout(w);
-            var result = athlete.TweetTodaysWorkout();
+            var result = athlete.tweetTodaysWorkout();
             Assert.AreEqual(120, result.Length, 20);
         }
 
