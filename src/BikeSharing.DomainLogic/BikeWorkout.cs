@@ -202,7 +202,7 @@ namespace Training
                         return Tweetify($"I ran {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}");
                     }
 
-                    return todaysWorkout.Notes.Length <= TweetSize ? todaysWorkout.Notes : Tweetify(todaysWorkout.Notes);
+                    return todaysWorkout.Notes.Length == TweetSize ? todaysWorkout.Notes : Tweetify(todaysWorkout.Notes);
                 }
             }
             return null;
@@ -237,13 +237,4 @@ namespace Training
             return hashes;
         }
     }
-}
-
-namespace BikeSharing.DomainLogic
-{
-    public enum WorkoutType
-    {
-        Indoor, Outdoor
-    }
-
 }

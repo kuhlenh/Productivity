@@ -49,6 +49,7 @@
     <Compile Include="BikeWorkout.cs" />
     <Compile Include="Gender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WorkoutType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

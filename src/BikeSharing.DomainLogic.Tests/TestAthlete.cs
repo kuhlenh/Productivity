@@ -85,6 +85,16 @@ namespace Trainer.Tests
         }
 
         [TestMethod]
+        public void TestAthleteTweetTodayWorkout()
+        {
+            var athlete = CreateFemaleAthleteNoWorkout();
+            var w = new Workout(DateTime.Now, TimeSpan.FromMinutes(67), 125, "A squat a day keeps the doctor away!");
+            athlete.AddWorkout(w);
+            var result = athlete.tweetTodaysWorkout();
+            Assert.AreEqual(120, result.Length, 20);
+        }
+
+        [TestMethod]
         public void TestAthleteTweetTodayMessageEmpty()
         {
             var athlete = CreateMaleAthleteNoWorkout();
