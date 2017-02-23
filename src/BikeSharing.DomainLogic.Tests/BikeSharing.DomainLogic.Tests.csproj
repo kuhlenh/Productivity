@@ -54,8 +54,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TrainerTests.cs" />
+    <Compile Include="TestAthlete.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestWorkout.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

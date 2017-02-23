@@ -7,7 +7,6 @@ using Training;
 
 namespace Trainer.Tests
 {
-
     [TestClass]
     public class TestAthlete
     {
@@ -85,16 +84,6 @@ namespace Trainer.Tests
             Assert.AreEqual(120, result.Length, 20);
         }
 
-        //[TestMethod]
-        //public void TestAthleteTweetTodayDistanceWorkout()
-        //{
-        //    CreateFemaleAthleteNoWorkout();
-        //    var w = new DistanceWorkout(.99, DateTime.Now, TimeSpan.FromMinutes(20), 125, "Meh. Light jog on treadmill...");
-        //    athlete.AddWorkout(w);
-        //    var result = athlete.TweetTodaysWorkout();
-        //    Assert.AreEqual(120, result.Length,20);
-        //}
-
         [TestMethod]
         public void TestAthleteTweetTodayMessageEmpty()
         {
@@ -124,12 +113,21 @@ namespace Trainer.Tests
         }
 
         [TestMethod]
-        public void TestGetCaloriesBurnedNullTimeSpan()
+        public void TestBasalMetabolicRateMale()
         {
             var athlete = CreateMaleAthleteNoWorkout();
-            var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.Zero, 93, "Test drove the new bike around Greenlake!");
-            athlete.AddWorkout(w);
-            var calories = athlete.GetCaloriesBurned(w);
+            var actual = athlete.BasalMetabolicRate;
+            var expected = 66.47 + (13.75 * 201 * 0.453592) + (5.003 * 72 * 2.54) - (6.755 * 27);
+            Assert.AreEqual(expected, actual, .00001);
+        }
+
+        [TestMethod]
+        public void TestBasalMetabolicRateFemale()
+        {
+            var athlete = CreateFemaleAthleteNoWorkout();
+            var actual = athlete.BasalMetabolicRate;
+            var expected = 655.1 + (9.563 * 155 * 0.453592) + (1.850 * 71 * 2.54) - (4.676 * 25);
+            Assert.AreEqual(expected, actual, .00001);
         }
 
         [TestMethod]
@@ -148,95 +146,6 @@ namespace Trainer.Tests
             var athlete = CreateMaleAthleteWithWorkouts();
             var tweet = athlete.TweetBestWorkoutOfWeek();
             Assert.AreEqual(120, tweet.Length, 20);
-        }
-    }
-
-
-    [TestClass]
-    public class TestIWorkout
-    {
-        Workout _workout;
-
-        public void Create(string workoutName)
-        {
-            switch (workoutName)
-            {
-                case "bike":
-                    _workout = CreateBikeWorkout();
-                    break;
-                case "distance":
-                    _workout = CreateDistanceWorkout();
-                    break;
-                case "workout":
-                    _workout = CreateWorkout();
-                    break;
-                default:
-                    break;
-
-            }
-        }
-
-        private Workout CreateBikeWorkout()
-        {
-            return new BikeWorkout(WorkoutType.Outdoor, 21.6, DateTime.Now.AddDays(-5), TimeSpan.FromMinutes(83),  117, "Biking to Red Hook Brewery on the Burke-Gilman. What a day to be alive!");
-        }
-
-        private Workout CreateDistanceWorkout()
-        {
-            return new DistanceWorkout(5.2, DateTime.Now.AddDays(-2), TimeSpan.FromMinutes(37), 112, "5K run around Greenlake with the bf ;)");
-        }
-
-        private Workout CreateWorkout()
-        {
-            return new Workout(DateTime.Now, TimeSpan.FromMinutes(25), 93, "Pumpin' some iron.");
-        }
-
-        [TestMethod]
-        public void TestBikeWorkoutPace()
-        {
-            Create("bike");
-            var bike = (BikeWorkout)_workout;
-            Assert.AreEqual(15.6144578, bike.Pace, .000001);
-        }
-
-        [TestMethod]
-        public void TestBikeWorkoutNotes()
-        {
-            Create("bike");
-            var bike = (BikeWorkout)_workout;
-            Assert.AreEqual(71, bike.Notes.Length);
-        }
-
-        [TestMethod]
-        public void TestBikeWorkoutHeartRate()
-        {
-            Create("bike");
-            var bike = (BikeWorkout)_workout;
-            Assert.AreEqual(117, bike.AverageHeartRate);
-        }
-
-        [TestMethod]
-        public void TestDistanceWorkoutPace()
-        {
-            Create("distance");
-            var distance = (DistanceWorkout)_workout;
-            Assert.AreEqual(8.4324324, distance.Pace, .000001);
-        }
-
-        [TestMethod]
-        public void TestDistanceWorkoutHeartRate()
-        {
-            Create("distance");
-            var distance = (DistanceWorkout)_workout;
-            Assert.AreEqual(112, distance.AverageHeartRate);
-        }
-
-        [TestMethod]
-        public void TestWorkoutNotes()
-        {
-            Create("workout");
-            var workout = (Workout)_workout;
-            Assert.AreEqual(18, workout.Notes.Length);
         }
     }
 }
