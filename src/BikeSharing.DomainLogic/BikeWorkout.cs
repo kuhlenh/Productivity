@@ -17,10 +17,6 @@ namespace Training
             Date = date;
             Duration = duration;
             AverageHeartRate = averageHeartRate;
-            if (notes == null)
-            {
-                throw new ArgumentNullException();
-            }
             Notes = notes;
         }
     }
@@ -191,7 +187,7 @@ namespace Training
         {
             if (Workouts != null)
             {
-                var todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
+                Workout todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
                 if (todaysWorkout != null)
                 {
                     var bike = todaysWorkout as BikeWorkout;
