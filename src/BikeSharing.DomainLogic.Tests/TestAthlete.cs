@@ -145,7 +145,8 @@ namespace Trainer.Tests
         {
             var athlete = CreateFemaleAthleteWithWorkouts();
             var bestWorkout = athlete.GetWeeksBestWorkout();
-            var actual = athlete.Workouts.Where(w => w.Date.Date == DateTime.Now.Date).First();
+            var now = DateTime.Now.Date;
+            var actual = athlete.Workouts.Where(w => w.Date.Date == now).First();
             Assert.AreEqual(actual, bestWorkout.workout);
             Assert.AreEqual(527.066260994, bestWorkout.calories, .000001);
         }
