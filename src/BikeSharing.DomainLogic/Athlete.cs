@@ -147,7 +147,8 @@ namespace Training
         {
             if (Workouts != null)
             {
-                Workout todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
+                DateTime today = DateTime.Now.Date;
+                Workout todaysWorkout = Workouts.Where(w => w.Date.Date == today).FirstOrDefault();
                 if (todaysWorkout != null)
                 {
                     var bike = todaysWorkout as BikeWorkout;
