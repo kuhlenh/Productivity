@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Training
 {
@@ -126,16 +127,17 @@ namespace Training
             }
         }
 
-        public (Workout workout, double calories) GetWeeksBestWorkout()
+        public Tuple<Workout, double> GetWeeksBestWorkout()
         {
             var lastWeekWorkouts = Workouts.Where(w => w.Date > DateTime.Now.Date.Subtract(TimeSpan.FromDays(7)));
             var workoutWithMostCalsBurned = lastWeekWorkouts.Aggregate((w1, w2) => GetCaloriesBurned(w1) > GetCaloriesBurned(w2) ? w1 : w2);
-            return (workoutWithMostCalsBurned, GetCaloriesBurned(workoutWithMostCalsBurned));
+            return Tuple.Create(workoutWithMostCalsBurned, GetCaloriesBurned(workoutWithMostCalsBurned));
         }
 
         public string TweetBestWorkoutOfWeek()
         {
             var best = GetWeeksBestWorkout();
+
             if (best.Item2 > GoodCalorieBurn)
             {
                 return Tweetify(best.Item1.Notes);
@@ -145,58 +147,51 @@ namespace Training
 
         public string tweetTodaysWorkout()
         {
-            if (Workouts != null)
+            if (Workouts == null) return null;
+
+            DateTime today = DateTime.Now.Date;
+            Workout todaysWorkout = Workouts.Where(w => w.Date.Date == today).FirstOrDefault();
+            if (todaysWorkout == null) return null;
+
+            var bike = todaysWorkout as BikeWorkout;
+            if (bike != null)
             {
-                Workout todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
-                if (todaysWorkout != null)
-                {
-                    var bike = todaysWorkout as BikeWorkout;
-                    if (bike != null)
-                    {
-                        return Tweetify($"I biked {bike.Distance:0.0} miles @ {bike.Pace:0.0} mph ({bike.Type}). {bike.Notes}");
-                    }
-
-                    var dist = todaysWorkout as DistanceWorkout;
-                    if (dist != null)
-                    {
-                        return Tweetify($"I ran {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}");
-                    }
-
-                    return todaysWorkout.Notes.Length == TweetSize 
-                        ? todaysWorkout.Notes 
-                        : Tweetify(todaysWorkout.Notes);
-                }
+                return Tweetify($"I biked {bike.Distance:0.0} miles @ {bike.Pace:0.0} mph ({bike.Type}). {bike.Notes}");
             }
-            return null;
+
+            var dist = todaysWorkout as DistanceWorkout;
+            if (dist != null)
+            {
+                return Tweetify($"I ran {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}");
+            }
+
+            return todaysWorkout.Notes.Length == TweetSize 
+                ? todaysWorkout.Notes 
+                : Tweetify(todaysWorkout.Notes);
         }
 
         private string Tweetify(string msg)
         {
-            if (msg.Length >= TweetSize)
-                return msg.Substring(0, TweetSize-3) + "...";
-            else
-                return msg + GetHashTags(TweetSize - msg.Length);
+            if (msg.Length >= TweetSize) return msg.Substring(0, TweetSize - 3) + "...";
+
+            var sb = new StringBuilder(msg);
+            var random = new Random();
+
+            while (TryAddHashTag(sb, random)) { }
+
+            return sb.ToString();
         }
 
-        private string GetHashTags(int charsLeft)
+        private bool TryAddHashTag(StringBuilder sb, Random random)
         {
-            var hashes = "";
-            var random = new Random();
-            while (charsLeft > 0)
-            {
-                var r = random.Next(0, HASHTAGS.Length);
-                var hashtag = " " + HASHTAGS[r];
-                if (hashtag.Length > charsLeft)
-                {
-                    charsLeft = -1;
-                }
-                else
-                {
-                    charsLeft -= hashtag.Length;
-                    hashes += hashtag;
-                }
-            }
-            return hashes;
+            var r = random.Next(0, HASHTAGS.Length);
+            var hashtag = " " + HASHTAGS[r];
+
+            if (sb.Length + hashtag.Length > TweetSize) return false;
+
+            sb.Append(hashtag);
+            return true;
         }
+
     }
 }

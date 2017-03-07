@@ -147,8 +147,8 @@ namespace Trainer.Tests
             var bestWorkout = athlete.GetWeeksBestWorkout();
             var now = DateTime.Now.Date;
             var actual = athlete.Workouts.Where(w => w.Date.Date == now).First();
-            Assert.AreEqual(actual, bestWorkout.workout);
-            Assert.AreEqual(527.066260994, bestWorkout.calories, .000001);
+            Assert.AreEqual(actual, bestWorkout.Item1);
+            Assert.AreEqual(527.066260994, bestWorkout.Item2, .000001);
         }
 
         [TestMethod]
