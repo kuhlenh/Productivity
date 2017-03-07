@@ -153,7 +153,7 @@ namespace Training
             Workout todaysWorkout = Workouts.Where(w => w.Date.Date == today).FirstOrDefault();
             if (todaysWorkout == null) return null;
 
-            var bike = todaysWorkout as BikeWorkout;
+            var bike = todaysWorkout as BikeWorkouts;
             if (bike != null)
             {
                 return Tweetify($"I biked {bike.Distance:0.0} miles @ {bike.Pace:0.0} mph ({bike.Type}). {bike.Notes}");

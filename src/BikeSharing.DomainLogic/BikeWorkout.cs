@@ -31,11 +31,11 @@ namespace Training
         }
     }
 
-    public class BikeWorkout : DistanceWorkout
+    public class BikeWorkouts : DistanceWorkout
     {
         public WorkoutType Type { get; }
 
-        public BikeWorkout(WorkoutType type, double distance, DateTime datetime, TimeSpan duration, double rate, string notes) 
+        public BikeWorkouts(WorkoutType type, double distance, DateTime datetime, TimeSpan duration, double rate, string notes) 
             : base(distance, datetime, duration, rate, notes)
         {
             Type = type;
