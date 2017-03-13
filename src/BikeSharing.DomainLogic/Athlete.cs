@@ -128,7 +128,8 @@ namespace Training
 
         public (Workout workout, double calories) GetWeeksBestWorkout()
         {
-            var lastWeekWorkouts = Workouts.Where(w => w.Date > DateTime.Now.Date.Subtract(TimeSpan.FromDays(7)));
+            DateTime today = DateTime.Now;
+            var lastWeekWorkouts = Workouts.Where(w => w.Date > today.Date.Subtract(TimeSpan.FromDays(7)));
             var workoutWithMostCalsBurned = lastWeekWorkouts.Aggregate((w1, w2) => GetCaloriesBurned(w1) > GetCaloriesBurned(w2) ? w1 : w2);
             return (workoutWithMostCalsBurned, GetCaloriesBurned(workoutWithMostCalsBurned));
         }
