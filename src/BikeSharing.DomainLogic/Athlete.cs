@@ -128,7 +128,8 @@ namespace Training
 
         public (Workout workout, double calories) GetWeeksBestWorkout()
         {
-            var lastWeekWorkouts = Workouts.Where(w => w.Date > DateTime.Now.Date.Subtract(TimeSpan.FromDays(7)));
+            DateTime today = DateTime.Now;
+            var lastWeekWorkouts = Workouts.Where(w => w.Date > today.Date.Subtract(TimeSpan.FromDays(7)));
             var workoutWithMostCalsBurned = lastWeekWorkouts.Aggregate((w1, w2) => GetCaloriesBurned(w1) > GetCaloriesBurned(w2) ? w1 : w2);
             return (workoutWithMostCalsBurned, GetCaloriesBurned(workoutWithMostCalsBurned));
         }
@@ -147,7 +148,8 @@ namespace Training
         {
             if (Workouts != null)
             {
-                Workout todaysWorkout = Workouts.Where(w => w.Date.Date == DateTime.Now.Date).FirstOrDefault();
+                DateTime today = DateTime.Now.Date;
+                Workout todaysWorkout = Workouts.Where(w => w.Date.Date == today).FirstOrDefault();
                 if (todaysWorkout != null)
                 {
                     var bike = todaysWorkout as BikeWorkout;
@@ -162,7 +164,9 @@ namespace Training
                         return Tweetify($"I ran {dist.Distance:0.0} miles @ {dist.Pace:0.0} mph. {dist.Notes}");
                     }
 
-                    return todaysWorkout.Notes.Length == TweetSize ? todaysWorkout.Notes : Tweetify(todaysWorkout.Notes);
+                    return todaysWorkout.Notes.Length == TweetSize 
+                        ? todaysWorkout.Notes 
+                        : Tweetify(todaysWorkout.Notes);
                 }
             }
             return null;
