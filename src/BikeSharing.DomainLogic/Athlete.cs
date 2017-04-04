@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Training
 {
@@ -174,31 +175,25 @@ namespace Training
 
         private string Tweetify(string msg)
         {
-            if (msg.Length >= TweetSize)
-                return msg.Substring(0, TweetSize-3) + "...";
-            else
-                return msg + GetHashTags(TweetSize - msg.Length);
+            if (msg.Length >= TweetSize) return msg.Substring(0, TweetSize - 3) + "...";
+
+            var sb = new StringBuilder(msg);
+            var random = new Random();
+
+            while (TryAddHashTag(sb, random)) { }
+
+            return sb.ToString();
         }
 
-        private string GetHashTags(int charsLeft)
+        private bool TryAddHashTag(StringBuilder sb, Random random)
         {
-            var hashes = "";
-            var random = new Random();
-            while (charsLeft > 0)
-            {
-                var r = random.Next(0, HASHTAGS.Length);
-                var hashtag = " " + HASHTAGS[r];
-                if (hashtag.Length > charsLeft)
-                {
-                    charsLeft = -1;
-                }
-                else
-                {
-                    charsLeft -= hashtag.Length;
-                    hashes += hashtag;
-                }
-            }
-            return hashes;
+            var r = random.Next(0, HASHTAGS.Length);
+            var hashtag = " " + HASHTAGS[r];
+
+            if (sb.Length + hashtag.Length > TweetSize) return false;
+
+            sb.Append(hashtag);
+            return true;
         }
     }
 }
