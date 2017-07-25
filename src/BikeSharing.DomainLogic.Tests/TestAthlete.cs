@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using BikeSharing.DomainLogic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Training;
+using Xunit;
+using Assert = Xunit.Assert;
 
-namespace Trainer.Tests
+namespace BikeSharing.DomainLogic.Tests
 {
-    [TestClass]
     public class TestAthlete
     {
         public Athlete CreateFemaleAthleteNoWorkout()
@@ -38,125 +36,125 @@ namespace Trainer.Tests
             return athlete;
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAthleteAddWorkout()
         {
             var athlete = CreateFemaleAthleteWithWorkouts();
             var w = new DistanceWorkout(.99, DateTime.Now.AddDays(-6), TimeSpan.FromMinutes(20), 125, "Meh. Light jog on treadmill...");
             athlete.AddWorkout(w);
-            Assert.AreEqual(3, athlete.Workouts.Count);
+            Assert.Equal(3, athlete.Workouts.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAthleteNotes()
         {
             var athlete = CreateFemaleAthleteWithWorkouts();
-            Assert.AreEqual(41, athlete.Workouts.First().Notes.Length);
+            Assert.Equal(41, athlete.Workouts.First().Notes.Length);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAthleteTweetTodayMessage()
         {
             var athlete = CreateFemaleAthleteWithWorkouts();
-            var result = athlete.tweetTodaysWorkout();
-            Assert.AreEqual(120, result.Length, 20);
+            var result = athlete.TweetTodaysWorkout();
+            Assert.Equal(true, 140-result.Length >=0);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestWorkoutNotesNull()
         {
             var athlete = CreateFemaleAthleteNoWorkout();
-            Assert.ThrowsException<ArgumentNullException>(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var w = new Workout(DateTime.Now, TimeSpan.FromMinutes(13), 84, null);
                 athlete.AddWorkout(w);
-                athlete.tweetTodaysWorkout();
+                athlete.TweetTodaysWorkout();
             });
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAthleteTweetTodayBikeWorkout()
         {
             var athlete = CreateFemaleAthleteNoWorkout();
             var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.FromMinutes(67), 125, "Learning how to bike in the streets! :O");
             athlete.AddWorkout(w);
-            var result = athlete.tweetTodaysWorkout();
-            Assert.AreEqual(120, result.Length, 20);
+            var result = athlete.TweetTodaysWorkout();
+            Assert.Equal(true, 140-result.Length >=0);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAthleteTweetTodayWorkout()
         {
             var athlete = CreateFemaleAthleteNoWorkout();
             var w = new Workout(DateTime.Now, TimeSpan.FromMinutes(67), 125, "A squat a day keeps the doctor away!");
             athlete.AddWorkout(w);
-            var result = athlete.tweetTodaysWorkout();
-            Assert.AreEqual(120, result.Length, 20);
+            var result = athlete.TweetTodaysWorkout();
+            Assert.Equal(true, 140-result.Length >=0);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAthleteTweetTodayMessageEmpty()
         {
             var athlete = CreateMaleAthleteNoWorkout();
-            var result = athlete.tweetTodaysWorkout();
-            Assert.AreEqual(null, result);
+            var result = athlete.TweetTodaysWorkout();
+            Assert.Equal(null, result);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAthleteTweetTodayMessageNoToday()
         {
             var athlete = CreateMaleAthleteNoWorkout();
             var w = new DistanceWorkout(1.5, DateTime.Now.AddDays(-8), TimeSpan.FromMinutes(13), 84, "");
             athlete.AddWorkout(w);
-            var result = athlete.tweetTodaysWorkout();
-            Assert.AreEqual(null, result);
+            var result = athlete.TweetTodaysWorkout();
+            Assert.Equal(null, result);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestAthleteBikeTweet()
         {
             var athlete = CreateMaleAthleteNoWorkout();
             var w = new BikeWorkout(WorkoutType.Outdoor, 8.21, DateTime.Now, TimeSpan.FromMinutes(67), 1323, "Beautiful day to bike! Jk, fam. It's raining out here...but I enjoyed teaching my girlfriend how to be street smart when riding bikes. STP 2018 here we come!");
             athlete.AddWorkout(w);
-            var result = athlete.tweetTodaysWorkout();
-            Assert.AreEqual(120, result.Length, 20);
+            var result = athlete.TweetTodaysWorkout();
+            Assert.Equal(true, 140.0-result.Length>=0);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestBasalMetabolicRateMale()
         {
             var athlete = CreateMaleAthleteNoWorkout();
             var actual = athlete.BasalMetabolicRate;
             var expected = 66.47 + (13.75 * 201 * 0.453592) + (5.003 * 72 * 2.54) - (6.755 * 27);
-            Assert.AreEqual(expected, actual, .00001);
+            Assert.Equal(expected, actual);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestBasalMetabolicRateFemale()
         {
             var athlete = CreateFemaleAthleteNoWorkout();
             var actual = athlete.BasalMetabolicRate;
             var expected = 655.1 + (9.563 * 155 * 0.453592) + (1.850 * 71 * 2.54) - (4.676 * 25);
-            Assert.AreEqual(expected, actual, .00001);
+            Assert.Equal(true, Math.Abs(expected-actual) < .001);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestGetBestWeekWorkout()
         {
             var athlete = CreateFemaleAthleteWithWorkouts();
             var bestWorkout = athlete.GetWeeksBestWorkout();
             var now = DateTime.Now.Date;
-            var actual = athlete.Workouts.Where(w => w.Date.Date == now).First();
-            Assert.AreEqual(actual, bestWorkout.workout);
-            Assert.AreEqual(527.066260994, bestWorkout.calories, .000001);
+            var actual = athlete.Workouts.First(w => w.Date.Date == now);
+            Assert.Equal(actual, bestWorkout.workout);
+            Assert.Equal(true, Math.Abs(527.066260994-bestWorkout.calories) < .001);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestTweetBestWorkoutWeek()
         {
             var athlete = CreateMaleAthleteWithWorkouts();
             var tweet = athlete.TweetBestWorkoutOfWeek();
-            Assert.AreEqual(120, tweet.Length, 20);
+            Assert.Equal(true, 140-tweet.Length >=0);
         }
     }
 }

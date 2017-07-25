@@ -1,7 +1,6 @@
 ﻿using System;
-using BikeSharing.DomainLogic;
 
-namespace Training
+namespace BikeSharing.DomainLogic
 {
     public class Workout
     {
@@ -15,7 +14,7 @@ namespace Training
             Date = date;
             Duration = duration;
             AverageHeartRate = averageHeartRate;
-            Notes = notes;
+            Notes = notes ?? throw new ArgumentNullException(nameof(notes));
         }
     }
 
@@ -28,6 +27,12 @@ namespace Training
         {
             Distance = distance;
             Pace = distance / duration.TotalHours;
+        }
+
+        void DoStuff(Workout w)
+        {
+            var x = w.Notes;
+           
         }
     }
 

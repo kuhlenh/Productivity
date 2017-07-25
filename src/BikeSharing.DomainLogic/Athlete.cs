@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BikeSharing.DomainLogic;
 
 namespace Training
 {
@@ -144,12 +145,12 @@ namespace Training
             return Tweetify("Casual workout week...");
         }
 
-        public string tweetTodaysWorkout()
+        public string TweetTodaysWorkout()
         {
             if (Workouts != null)
             {
                 DateTime today = DateTime.Now.Date;
-                Workout todaysWorkout = Workouts.Where(w => w.Date.Date == today).FirstOrDefault();
+                Workout todaysWorkout = Workouts.FirstOrDefault(w => w.Date.Date == today);
                 if (todaysWorkout != null)
                 {
                     var bike = todaysWorkout as BikeWorkout;
@@ -176,8 +177,7 @@ namespace Training
         {
             if (msg.Length >= TweetSize)
                 return msg.Substring(0, TweetSize-3) + "...";
-            else
-                return msg + GetHashTags(TweetSize - msg.Length);
+            return msg + GetHashTags(TweetSize - msg.Length);
         }
 
         private string GetHashTags(int charsLeft)
